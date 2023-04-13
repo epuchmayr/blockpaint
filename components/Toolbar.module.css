@@ -1,6 +1,12 @@
 
 
+
 .toolbar {
+padding: .5rem;
+border-right: 1px solid #aaa;
+}
+
+.toolSelectMenu {
     line-height: 0;
     background-color: #666;
     border: 1px solid #222;
@@ -32,3 +38,13 @@
     background-image: url('/images/icons/eyedrop.png');
 }
 
+
+.foregroundColour {
+    padding: 0;
+}
+.foregroundColour::-webkit-color-swatch-wrapper {
+    padding: 0;
+}
+.foregroundColour::-webkit-color-swatch {
+    border: none;
+}

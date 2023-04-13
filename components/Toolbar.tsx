@@ -1,20 +1,21 @@
-import { MouseEventHandler } from 'react'
+import { ChangeEventHandler, FocusEventHandler, MouseEventHandler,useContext } from 'react'
 import { TOOLS } from '../CONSTANTS'
 import styles from './Toolbar.module.css'
 
+import { SessionPrefsContext } from '../pages/index'
 
-export default function Toolbar({handleClickTool, currentTool}:{
-        handleClickTool: MouseEventHandler,
-        currentTool: string
-    }) {
 
+function ToolSelectMenu({handleClickTool}:{
+    handleClickTool: MouseEventHandler
+}) {
+
+    const sessionPrefs = useContext(SessionPrefsContext);
     return (
         
-        <div className={styles.toolbar}>
+        <div className={styles.toolSelectMenu}>
 
             {Object.keys(TOOLS).map((value, index) => {
-
-            let isToolSelected = (currentTool === TOOLS[value]) ? 'selected': ''
+            let isToolSelected = (sessionPrefs.currentTool === TOOLS[value]) ? 'selected': ''
 
             return (
                 <button
@@ -27,11 +28,37 @@ export default function Toolbar({handleClickTool, currentTool}:{
                 </button>
             )
             })}
-            <style jsx>{`
-            `}</style>
+
         </div>
     )
+}
 
 
+
+
+
+export default function Toolbar({handleClickTool, handlePickerChange, handlePickerBlur}:{
+        handleClickTool: MouseEventHandler
+        handlePickerChange: ChangeEventHandler
+        handlePickerBlur: FocusEventHandler
+    }) {
+
+    const sessionPrefs = useContext(SessionPrefsContext);
+
+    return (
+        <aside className={styles.toolbar}>
+            <ToolSelectMenu handleClickTool={handleClickTool} />
+        <label>
+            <input
+            className={styles.foregroundColour}
+            name='color'
+            type='color'
+            value={sessionPrefs.currentColor.toString()}
+            onChange={handlePickerChange}
+            onBlur={handlePickerBlur}
+            />
+          </label>
+        </aside>
+    )
 
 }

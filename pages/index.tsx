@@ -1,7 +1,7 @@
 import Head from 'next/head'
 import clientPromise from '../lib/mongodb'
 import { InferGetServerSidePropsType } from 'next'
-import { ChangeEvent, MouseEventHandler, useEffect, useState } from 'react'
+import { ChangeEvent, FocusEvent, MouseEventHandler, useEffect, useState, createContext } from 'react'
 
 
 import { TOOLS, PREFS, GRID } from '../CONSTANTS'
@@ -9,6 +9,7 @@ import { TOOLS, PREFS, GRID } from '../CONSTANTS'
 import Grid from '../components/Grid'
 import Toolbar from '../components/Toolbar'
 import Palette from '../components/Palette'
+import Palettes from '../components/Palettes'
 
 
 export async function getServerSideProps() {
@@ -51,20 +52,25 @@ const gridArray = Array.from(Array(GRIDHEIGHT), () => {
 });
 
 
+const defaultSessionPrefs = { 
+    currentColor: DEFAULTCOLOR,
+    currentTool: TOOLS.DRAW,
+    colorHistory: [DEFAULTCOLOR]
+  }
+
+
+export const SessionPrefsContext = createContext(defaultSessionPrefs);
 
 export default function Home({
   isConnected,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
 
-  let [sessionPrefs, setSessionPrefs] = useState({ 
-    currentColor: DEFAULTCOLOR,
-    currentTool: TOOLS.DRAW,
-    colorHistory: [DEFAULTCOLOR]
-  })
+  let [sessionPrefs, setSessionPrefs] = useState(defaultSessionPrefs)
 
   let [gridData, setGridData] = useState(gridArray)
   let [isHeldActive, setIsHeldActive] = useState(false)
  
+
 
   interface position {
     row: number, col: number
@@ -166,7 +172,7 @@ export default function Home({
   }
 
 
-  function handlePickerBlur(event: ChangeEvent<HTMLInputElement>) {
+  function handlePickerBlur(event: FocusEvent<HTMLInputElement>) {
     addColorToHistory(event.target?.value)
   }
 
@@ -241,20 +247,13 @@ export default function Home({
       
       <main>
 
-        <aside className='tool-menu'>
-          <Toolbar handleClickTool={handleClickTool} currentTool={sessionPrefs.currentTool} />
-
-          <label>
-            <input
-            className='foregroundColour'
-            name='color'
-            type='color'
-            value={sessionPrefs.currentColor.toString()}
-            onChange={handlePickerChange}
-            onBlur={handlePickerBlur}
-            />
-          </label>
-        </aside>
+        <SessionPrefsContext.Provider value={sessionPrefs}>
+          <Toolbar
+            handleClickTool={handleClickTool}
+            handlePickerChange={handlePickerChange}
+            handlePickerBlur={handlePickerBlur}
+          />
+        </SessionPrefsContext.Provider>
         
         <div className='artboard'>
           <Grid gridData={gridData} handleMouseDown={handleMouseDown} handleMouseEnter={handleMouseEnter} />
@@ -273,15 +272,9 @@ export default function Home({
           <button onClick={handleDownload}>Download Image</button>
           <br />
 
-          <Palette
-            title={'Basic Colours'}
-            swatches={['#ffffff', '#000000', '#ff0000', '#ffff00', '#00ffff', '#00ff00', '#0000ff', '#ff00ff']}
-            clickHandler={handleChangeColor}
-          />
-          <Palette
-            title={'Colour History'}
-            swatches={sessionPrefs.colorHistory}
-            clickHandler={handleChangeColor}
+
+          <Palettes
+            handleChangeColor={handleChangeColor}
           />
 
         </aside>
@@ -309,16 +302,6 @@ export default function Home({
         .container {
           background-color: #bbb;
         }
-        
-        .foregroundColour {
-          padding: 0;
-        }
-        .foregroundColour::-webkit-color-swatch-wrapper {
-          padding: 0; 
-        }
-        .foregroundColour::-webkit-color-swatch {
-          border: none;
-        }
 
         .container {
           min-height: 100vh;
@@ -337,11 +320,9 @@ export default function Home({
         aside {
           padding: .5rem;
         }
-        .tool-menu {
-          border-right: 1px solid #aaa;
-        }
         .artboard {
           align-self: center;
+          flex: none;
         }
         .options-menu {
           border-left: 1px solid #aaa;

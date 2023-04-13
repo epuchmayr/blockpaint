@@ -24,3 +24,7 @@ export const PREFS: {
 } = {
     SWATCH_HISTORY_SIZE: 24
 }
+
+export const SWATCHES = {
+    DEFAULT: ['#ffffff', '#000000', '#ff0000', '#ffff00', '#00ffff', '#00ff00', '#0000ff', '#ff00ff']
+}
