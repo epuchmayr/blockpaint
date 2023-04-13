@@ -1,13 +1,15 @@
 
+interface CONSTANTS {
+    [index: string]: number | string | Object;
+}
 
-
-export const TOOLS = {
+export const TOOLS: CONSTANTS = {
     DRAW: '1',
     ERASE: '2',
     EYEDROP: '3'
 }
 
-export const GRID = {
+export const GRID: CONSTANTS = {
     DEFAULT_COLOR: '#000000',
     DEFAULT_OPACITY: 1,
     DEFAULT_WIDTH: 25,
@@ -18,6 +20,6 @@ export const GRID = {
       }
 }
 
-export const PREFS = {
+export const PREFS: CONSTANTS = {
     SWATCH_HISTORY_SIZE: 24
 }

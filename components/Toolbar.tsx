@@ -1,4 +1,4 @@
-import { TOOLS } from '../CONSTANTS.js'
+import { TOOLS } from '../CONSTANTS'
 import styles from './Toolbar.module.css'
 
 
