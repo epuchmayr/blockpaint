@@ -1,3 +1,4 @@
+import { MouseEventHandler } from 'react'
 import styles from './Palette.module.css'
 
 
@@ -8,7 +9,7 @@ export default function Palette({
 } : {
     title: string
     swatches: string[]
-    clickHandler
+    clickHandler: MouseEventHandler
     }) {
 
 

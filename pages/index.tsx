@@ -1,7 +1,7 @@
 import Head from 'next/head'
 import clientPromise from '../lib/mongodb'
 import { InferGetServerSidePropsType } from 'next'
-import { ChangeEvent, useEffect, useState } from 'react'
+import { ChangeEvent, MouseEventHandler, useEffect, useState } from 'react'
 
 
 import { TOOLS, PREFS, GRID } from '../CONSTANTS'
@@ -94,14 +94,14 @@ export default function Home({
   }
 
 
-  function handleMouseEnter(event: any, position: position) {
+  function handleMouseEnter(event: MouseEventHandler, position: position) {
     if (isHeldActive) {
       handleMouseDown(event, position)
     }
   }
 
 
-  function handleChangeColor(event: ChangeEvent) {
+  function handleChangeColor(event: MouseEvent) {
     const targetColor = event.target?.value
     setSessionPrefs(prevPrefs => {
       return {...prevPrefs,
@@ -157,7 +157,7 @@ export default function Home({
   }, [gridData])
 
 
-  function handlePickerChange(event) {
+  function handlePickerChange(event: ChangeEvent<HTMLInputElement>) {
     setSessionPrefs(prevPrefs => {
       return {...prevPrefs,
       currentColor: event.target?.value
@@ -166,7 +166,7 @@ export default function Home({
   }
 
 
-  function handlePickerBlur(event) {
+  function handlePickerBlur(event: ChangeEvent<HTMLInputElement>) {
     addColorToHistory(event.target?.value)
   }
 
@@ -180,8 +180,8 @@ export default function Home({
   useEffect(() => {
     // https://www.geeksforgeeks.org/how-to-trigger-a-file-download-when-clicking-an-html-button-or-javascript/
     if (!downloadImage) return
-    const canvas = document.getElementById("canvas")
-    const encodedImage = canvas.toDataURL();
+    const canvas: HTMLCanvasElement = document.getElementById("canvas")
+    const encodedImage = canvas!.toDataURL();
     console.log('image base/64', encodedImage)
  
     var element = document.createElement('a');
