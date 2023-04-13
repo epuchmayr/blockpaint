@@ -5,7 +5,7 @@ export default function Grid({
     handleMouseDown,
     handleMouseEnter
 }: {
-    gridData: [],
+    gridData: {color: string, opacity: number}[][],
     handleMouseDown: Function
     handleMouseEnter: Function
 }) {
@@ -13,11 +13,11 @@ export default function Grid({
     return (
         <>
         <div className={styles.colorGrid}>
-            {gridData.map((gridRow: [], row) => {
+            {gridData.map((gridRow, row) => {
                 return (
                     <>
                     <div key={`row${row}`} className={`${styles.gridRow} row-${row}`}>
-                        {gridRow.map((block: {color: string}, col) => {
+                        {gridRow.map((block, col) => {
                             return (
                                 <>
                                     <button

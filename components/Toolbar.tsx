@@ -1,9 +1,10 @@
+import { MouseEventHandler } from 'react'
 import { TOOLS } from '../CONSTANTS'
 import styles from './Toolbar.module.css'
 
 
 export default function Toolbar({handleClickTool, currentTool}:{
-        handleClickTool: Function,
+        handleClickTool: MouseEventHandler,
         currentTool: string
     }) {
 

@@ -101,7 +101,7 @@ export default function Home({
   }
 
 
-  function handleChangeColor(event: MouseEvent) {
+  function handleChangeColor(event: any) {
     const targetColor = event.target?.value
     setSessionPrefs(prevPrefs => {
       return {...prevPrefs,
@@ -127,7 +127,7 @@ export default function Home({
   }
 
 
-  function handleClickTool(event: MouseEvent) {
+  function handleClickTool(event: any) {
     setSessionPrefs(prevPrefs => {
       return {...prevPrefs,
       currentTool: event.target?.value
@@ -149,8 +149,8 @@ export default function Home({
         let sizeY = canvas.height / gridData.length
         let blockX = numBlock*sizeX
         let blockY = index*sizeY
-        ctx.fillStyle = currentBlock.color;
-        ctx.fillRect(blockX, blockY, blockX+sizeX, blockY+sizeY);
+        ctx!.fillStyle = currentBlock.color;
+        ctx!.fillRect(blockX, blockY, blockX+sizeX, blockY+sizeY);
       }
     })
 
@@ -180,7 +180,7 @@ export default function Home({
   useEffect(() => {
     // https://www.geeksforgeeks.org/how-to-trigger-a-file-download-when-clicking-an-html-button-or-javascript/
     if (!downloadImage) return
-    const canvas: HTMLCanvasElement = document.getElementById("canvas")
+    const canvas: HTMLCanvasElement = document.getElementById("canvas") as HTMLCanvasElement
     const encodedImage = canvas!.toDataURL();
     console.log('image base/64', encodedImage)
  
@@ -249,7 +249,7 @@ export default function Home({
             className='foregroundColour'
             name='color'
             type='color'
-            value={sessionPrefs.currentColor}
+            value={sessionPrefs.currentColor.toString()}
             onChange={handlePickerChange}
             onBlur={handlePickerBlur}
             />
