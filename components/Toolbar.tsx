@@ -7,8 +7,6 @@ export default function Toolbar({handleClickTool, currentTool}:{
         currentTool: string
     }) {
 
-
-
     return (
         
         <div className={styles.toolbar}>
@@ -18,7 +16,14 @@ export default function Toolbar({handleClickTool, currentTool}:{
             let isToolSelected = (currentTool === TOOLS[value]) ? 'selected': ''
 
             return (
-                <button key={`${index}-${TOOLS[value]}`} className={`${styles.tool} ${styles[value.toLowerCase()]} ${isToolSelected && styles.toolSelected}`} value={TOOLS[value]} onClick={handleClickTool}>{value}</button>
+                <button
+                    key={`${index}-${TOOLS[value]}`}
+                    className={`${styles.tool} ${styles[value.toLowerCase()]} ${isToolSelected && styles.toolSelected}`}
+                    value={TOOLS[value].toString()}
+                    onClick={handleClickTool}
+                >
+                    {value}
+                </button>
             )
             })}
             <style jsx>{`
