@@ -1,0 +1,12 @@
+
+.swatches {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    padding-block: 10px;
+}
+.swatch {
+    border: 1px solid lightgrey;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+}

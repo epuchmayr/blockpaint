@@ -1,0 +1,18 @@
+
+.colorGrid {
+    display: grid;
+    line-height: 0;
+    box-shadow: 0 0 0 2px grey;
+}
+.gridRow {
+}
+.colorBlock {
+    box-sizing: border-box;
+    display: inline-block;
+    border: 0 none;
+    width: 20px;
+    height: 20px;
+}
+.colorBlock:hover {
+    box-shadow: 0 0 0 2px grey inset;
+}

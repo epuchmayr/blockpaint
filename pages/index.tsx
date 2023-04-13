@@ -1,8 +1,17 @@
 import Head from 'next/head'
 import clientPromise from '../lib/mongodb'
 import { InferGetServerSidePropsType } from 'next'
+import { ChangeEvent, useEffect, useState } from 'react'
 
-export async function getServerSideProps(context) {
+
+import { TOOLS, PREFS, GRID } from '../CONSTANTS'
+
+import Grid from '../components/Grid'
+import Toolbar from '../components/Toolbar'
+import Palette from '../components/Palette'
+
+
+export async function getServerSideProps() {
   try {
     await clientPromise
     // `await clientPromise` will use the default database passed in the MONGODB_URI
@@ -25,108 +34,326 @@ export async function getServerSideProps(context) {
   }
 }
 
+// SET constants
+const DEFAULTCOLOR = GRID.DEFAULT_COLOR
+const DEFAULTBLOCK = GRID.DEFAULT_BLOCK
+const GRIDWIDTH = GRID.DEFAULT_WIDTH
+const GRIDHEIGHT = GRID.DEFAULT_HEIGHT
+
+// CREATE default block set
+let gridRow = Array.from(Array(GRIDWIDTH), () => {
+  return DEFAULTBLOCK;
+});
+
+const gridArray = Array.from(Array(GRIDHEIGHT), () => {
+  // use Array.from to make each row unique
+  return Array.from(gridRow);
+});
+
+
+
 export default function Home({
   isConnected,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+
+  let [sessionPrefs, setSessionPrefs] = useState({ 
+    currentColor: DEFAULTCOLOR,
+    currentTool: TOOLS.DRAW,
+    colorHistory: [DEFAULTCOLOR]
+  })
+
+  let [gridData, setGridData] = useState(gridArray)
+  let [isHeldActive, setIsHeldActive] = useState(false)
+ 
+
+  interface position {
+    row: number, col: number
+  }
+
+
+  function fillSingleBlock(position: position, newColor: string) {
+    setGridData(prevData => {
+      [...prevData][position.row][position.col] = {color: newColor, opacity: 1}
+      return [...prevData]
+    })
+  }
+
+
+  function handleMouseDown(event: any, position: position) {
+    if (sessionPrefs.currentTool === TOOLS.DRAW) {
+      fillSingleBlock(position, sessionPrefs.currentColor)
+    } else if (sessionPrefs.currentTool === TOOLS.ERASE) {
+      fillSingleBlock(position, '#ffffff')
+    } else if (sessionPrefs.currentTool === TOOLS.EYEDROP) {
+      setSessionPrefs(prevPrefs => {
+        return {...prevPrefs,
+        currentColor: gridData[position.row][position.col].color
+        }
+    })
+    }
+  }
+
+
+  function handleMouseEnter(event: any, position: position) {
+    if (isHeldActive) {
+      handleMouseDown(event, position)
+    }
+  }
+
+
+  function handleChangeColor(event: ChangeEvent) {
+    const targetColor = event.target?.value
+    setSessionPrefs(prevPrefs => {
+      return {...prevPrefs,
+      currentColor: targetColor
+      }
+    })
+
+    addColorToHistory(targetColor)
+  }
+
+
+  function addColorToHistory(newColor: string) {
+    console.log(sessionPrefs.colorHistory[0], newColor)
+    if (sessionPrefs.colorHistory[0] !== newColor) {
+    setSessionPrefs(prevPrefs => {
+      if (prevPrefs.colorHistory.length >= PREFS.SWATCH_HISTORY_SIZE) {
+        prevPrefs.colorHistory.pop()
+      } 
+      prevPrefs.colorHistory.unshift(newColor)
+      return prevPrefs
+    })
+    }
+  }
+
+
+  function handleClickTool(event: MouseEvent) {
+    setSessionPrefs(prevPrefs => {
+      return {...prevPrefs,
+      currentTool: event.target?.value
+      }
+    })
+  }
+
+
+  useEffect(() => {
+
+    const canvas = document.getElementById("canvas") as HTMLCanvasElement;
+    const ctx = canvas && canvas?.getContext("2d");
+
+    gridData.map((row, index) => {
+      for (const block in row) {
+        let numBlock = parseInt(block)
+        let currentBlock = row[numBlock]
+        let sizeX = canvas.width / row.length
+        let sizeY = canvas.height / gridData.length
+        let blockX = numBlock*sizeX
+        let blockY = index*sizeY
+        ctx.fillStyle = currentBlock.color;
+        ctx.fillRect(blockX, blockY, blockX+sizeX, blockY+sizeY);
+      }
+    })
+
+  }, [gridData])
+
+
+  function handlePickerChange(event) {
+    setSessionPrefs(prevPrefs => {
+      return {...prevPrefs,
+      currentColor: event.target?.value
+      }
+    })
+  }
+
+
+  function handlePickerBlur(event) {
+    addColorToHistory(event.target?.value)
+  }
+
+  // DOWNLOAD image from canvas
+  let [downloadImage, setDownloadImage] = useState(false)
+
+  function handleDownload() {
+    setDownloadImage(true)
+  }
+
+  useEffect(() => {
+    // https://www.geeksforgeeks.org/how-to-trigger-a-file-download-when-clicking-an-html-button-or-javascript/
+    if (!downloadImage) return
+    const canvas = document.getElementById("canvas")
+    const encodedImage = canvas.toDataURL();
+    console.log('image base/64', encodedImage)
+ 
+    var element = document.createElement('a');
+    element.setAttribute('href', encodedImage);
+    element.setAttribute('download', 'file');
+ 
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+
+
+    setDownloadImage(false)
+  }, [downloadImage])
+
+  // SAVE image to database
+  async function handleSave(setId: string) {
+    
+    const response = await fetch(`../api/blockSet/update/${setId}`, {
+      method: "POST", // or 'PUT'
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(gridData)
+    });
+    const jsonData = await response.json();
+    console.log(jsonData);
+  }
+
+  
+  // LOAD image from database
+  async function handleLoad(setId: string) {
+    
+    const response = await fetch(`../api/blockSet/${setId}`);
+    const jsonData = await response.json();
+    console.log(jsonData.blockData);
+    setGridData(jsonData.blockData)
+  }
+
   return (
-    <div className="container">
+    <div
+      className="container"
+      onMouseDown={() => setIsHeldActive(true)}
+      onMouseUp={() => setIsHeldActive(false)}
+      onMouseEnter={() => setIsHeldActive(false)}
+    >
       <Head>
-        <title>Create Next App</title>
+        <title>Blockpaint</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
+      <header>
+        <h3>Blockpaint <span>{isConnected ? `connected` : `NOT connected`}</span></h3>
+      </header>
+
+
+
+      
       <main>
-        <h1 className="title">
-          Welcome to <a href="https://nextjs.org">Next.js with MongoDB!</a>
-        </h1>
 
-        {isConnected ? (
-          <h2 className="subtitle">You are connected to MongoDB</h2>
-        ) : (
-          <h2 className="subtitle">
-            You are NOT connected to MongoDB. Check the <code>README.md</code>{' '}
-            for instructions.
-          </h2>
-        )}
+        <aside className='tool-menu'>
+          <Toolbar handleClickTool={handleClickTool} currentTool={sessionPrefs.currentTool} />
 
-        <p className="description">
-          Get started by editing <code>pages/index.js</code>
-        </p>
-
-        <div className="grid">
-          <a href="https://nextjs.org/docs" className="card">
-            <h3>Documentation &rarr;</h3>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a href="https://nextjs.org/learn" className="card">
-            <h3>Learn &rarr;</h3>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/canary/examples"
-            className="card"
-          >
-            <h3>Examples &rarr;</h3>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="card"
-          >
-            <h3>Deploy &rarr;</h3>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
+          <label>
+            <input
+            className='foregroundColour'
+            name='color'
+            type='color'
+            value={sessionPrefs.currentColor}
+            onChange={handlePickerChange}
+            onBlur={handlePickerBlur}
+            />
+          </label>
+        </aside>
+        
+        <div className='artboard'>
+          <Grid gridData={gridData} handleMouseDown={handleMouseDown} handleMouseEnter={handleMouseEnter} />
         </div>
+
+        <aside className='options-menu'>
+          <p>
+          {`${GRIDWIDTH} x ${GRIDHEIGHT}`}
+          </p>
+          <canvas id='canvas' width="150" height="150">canvas</canvas>
+          <br />
+          <button onClick={() => handleLoad('64372cb6f8a0a2ee097b08bc')}>Load Image</button>
+          <br />
+          <button onClick={() => handleSave('64372cb6f8a0a2ee097b08bc')}>Save Image</button>
+          <br />
+          <button onClick={handleDownload}>Download Image</button>
+          <br />
+
+          <Palette
+            title={'Basic Colours'}
+            swatches={['#ffffff', '#000000', '#ff0000', '#ffff00', '#00ffff', '#00ff00', '#0000ff', '#ff00ff']}
+            clickHandler={handleChangeColor}
+          />
+          <Palette
+            title={'Colour History'}
+            swatches={sessionPrefs.colorHistory}
+            clickHandler={handleChangeColor}
+          />
+
+        </aside>
       </main>
 
       <footer>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <img src="/vercel.svg" alt="Vercel Logo" className="logo" />
-        </a>
       </footer>
 
       <style jsx>{`
+        header {
+          border-bottom: 1px solid #aaa;
+          padding-inline: 8px;
+        }
+        header h3 {
+          margin: 0;
+        }
+        header h3 span {
+          font-weight: 400;
+          font-size: 1rem;
+        }
+        p {
+          margin: 0 0 .5rem;
+        }
+
+        .container {
+          background-color: #bbb;
+        }
+        
+        .foregroundColour {
+          padding: 0;
+        }
+        .foregroundColour::-webkit-color-swatch-wrapper {
+          padding: 0; 
+        }
+        .foregroundColour::-webkit-color-swatch {
+          border: none;
+        }
+
         .container {
           min-height: 100vh;
-          padding: 0 0.5rem;
           display: flex;
           flex-direction: column;
-          justify-content: center;
-          align-items: center;
         }
 
         main {
-          padding: 5rem 0;
-          flex: 1;
           display: flex;
-          flex-direction: column;
-          justify-content: center;
-          align-items: center;
+          flex: 1;
+          flex-direction: row;
+          justify-content: space-between;
+          width: 100%;
+        }
+
+        aside {
+          padding: .5rem;
+        }
+        .tool-menu {
+          border-right: 1px solid #aaa;
+        }
+        .artboard {
+          align-self: center;
+        }
+        .options-menu {
+          border-left: 1px solid #aaa;
         }
 
         footer {
           width: 100%;
-          height: 100px;
+          height: 2rem;
           border-top: 1px solid #eaeaea;
           display: flex;
           justify-content: center;
           align-items: center;
-        }
-
-        footer img {
-          margin-left: 0.5rem;
         }
 
         footer a {
@@ -140,37 +367,6 @@ export default function Home({
           text-decoration: none;
         }
 
-        .title a {
-          color: #0070f3;
-          text-decoration: none;
-        }
-
-        .title a:hover,
-        .title a:focus,
-        .title a:active {
-          text-decoration: underline;
-        }
-
-        .title {
-          margin: 0;
-          line-height: 1.15;
-          font-size: 4rem;
-        }
-
-        .title,
-        .description {
-          text-align: center;
-        }
-
-        .subtitle {
-          font-size: 2rem;
-        }
-
-        .description {
-          line-height: 1.5;
-          font-size: 1.5rem;
-        }
-
         code {
           background: #fafafa;
           border-radius: 5px;
@@ -178,50 +374,6 @@ export default function Home({
           font-size: 1.1rem;
           font-family: Menlo, Monaco, Lucida Console, Liberation Mono,
             DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace;
-        }
-
-        .grid {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          flex-wrap: wrap;
-
-          max-width: 800px;
-          margin-top: 3rem;
-        }
-
-        .card {
-          margin: 1rem;
-          flex-basis: 45%;
-          padding: 1.5rem;
-          text-align: left;
-          color: inherit;
-          text-decoration: none;
-          border: 1px solid #eaeaea;
-          border-radius: 10px;
-          transition: color 0.15s ease, border-color 0.15s ease;
-        }
-
-        .card:hover,
-        .card:focus,
-        .card:active {
-          color: #0070f3;
-          border-color: #0070f3;
-        }
-
-        .card h3 {
-          margin: 0 0 1rem 0;
-          font-size: 1.5rem;
-        }
-
-        .card p {
-          margin: 0;
-          font-size: 1.25rem;
-          line-height: 1.5;
-        }
-
-        .logo {
-          height: 1em;
         }
 
         @media (max-width: 600px) {
