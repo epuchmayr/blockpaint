@@ -8,7 +8,6 @@ import { TOOLS, PREFS, GRID } from '../CONSTANTS'
 
 import Grid from '../components/Grid'
 import Toolbar from '../components/Toolbar'
-import Palette from '../components/Palette'
 import Palettes from '../components/Palettes'
 
 
@@ -55,10 +54,11 @@ const gridArray = Array.from(Array(GRIDHEIGHT), () => {
 const defaultSessionPrefs = { 
     currentColor: DEFAULTCOLOR,
     currentTool: TOOLS.DRAW,
+    currentSetId: '',
     colorHistory: [DEFAULTCOLOR]
   }
 
-
+  // SET context to share state with children
 export const SessionPrefsContext = createContext(defaultSessionPrefs);
 
 export default function Home({
@@ -70,7 +70,9 @@ export default function Home({
   let [gridData, setGridData] = useState(gridArray)
   let [isHeldActive, setIsHeldActive] = useState(false)
  
+  let [viewState, setViewState] = useState('loader')
 
+  let [setsData, setSetsData] = useState([])
 
   interface position {
     row: number, col: number
@@ -95,7 +97,7 @@ export default function Home({
         return {...prevPrefs,
         currentColor: gridData[position.row][position.col].color
         }
-    })
+      })
     }
   }
 
@@ -141,7 +143,7 @@ export default function Home({
     })
   }
 
-
+  // UPDATE canvas
   useEffect(() => {
 
     const canvas = document.getElementById("canvas") as HTMLCanvasElement;
@@ -170,7 +172,6 @@ export default function Home({
       }
     })
   }
-
 
   function handlePickerBlur(event: FocusEvent<HTMLInputElement>) {
     addColorToHistory(event.target?.value)
@@ -204,16 +205,26 @@ export default function Home({
 
   // SAVE image to database
   async function handleSave(setId: string) {
-    
-    const response = await fetch(`../api/blockSet/update/${setId}`, {
-      method: "POST", // or 'PUT'
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(gridData)
-    });
-    const jsonData = await response.json();
-    console.log(jsonData);
+    console.log('handle save', sessionPrefs)
+    if (setId !== '') {
+      const response = await fetch(`../api/blockSet/update/${setId}`, {
+        method: "POST", // or 'PUT'
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(gridData)
+      });
+      // const jsonData = await response.json();
+      // console.log(jsonData);
+    } else {
+      const response = await fetch(`../api/blockSet/createSet`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(gridData)
+      });
+    }
   }
 
   
@@ -222,9 +233,39 @@ export default function Home({
     
     const response = await fetch(`../api/blockSet/${setId}`);
     const jsonData = await response.json();
-    console.log(jsonData.blockData);
     setGridData(jsonData.blockData)
+    setSessionPrefs(prevPrefs => {
+      return {...prevPrefs,
+      currentSetId: setId
+      }
+    })
   }
+  
+  // LOAD sets from database
+  async function handleLoadSets() {
+    const response = await fetch(`../api/blockSet/getSets`);
+    const jsonData = await response.json();
+    const parsedData = JSON.parse(JSON.stringify(jsonData))
+    setSetsData(parsedData)
+    console.log(parsedData)
+    // return jsonData
+  }
+
+  function handleLoadNew() {
+    setGridData(gridArray)
+    setSessionPrefs(prevPrefs => {
+      return {...prevPrefs,
+      currentSetId: ''
+      }
+    })
+  }
+
+  useEffect(() => {
+    handleLoadSets()
+    if (sessionPrefs.currentSetId !== '') {
+      handleLoad(sessionPrefs.currentSetId)
+    }
+  }, [])
 
   return (
     <div
@@ -243,7 +284,22 @@ export default function Home({
       </header>
 
 
-
+      {(viewState === 'loader') ? (
+        <div className='setLoader'>
+        <button onClick={() => handleLoadNew()}>Create new set</button>
+          {setsData.map((set: {_id: string}, index) => {
+            return (
+              <button
+                key={set._id}
+                className={`setButton ${(sessionPrefs.currentSetId === set._id) ? `selected` : undefined}`}
+                onClick={() => handleLoad(set._id)}
+              >{`${set._id}`}</button>
+            )
+          })}
+        </div>
+      ) : (
+        <h2 className="subtitle"></h2>
+      )}
       
       <main>
 
@@ -265,11 +321,21 @@ export default function Home({
           </p>
           <canvas id='canvas' width="150" height="150">canvas</canvas>
           <br />
-          <button onClick={() => handleLoad('64372cb6f8a0a2ee097b08bc')}>Load Image</button>
+          {(sessionPrefs.currentSetId !== '') ? (
+            <>
+              {sessionPrefs.currentSetId}
+              <br />
+              <button onClick={() => handleLoad(sessionPrefs.currentSetId)}>Reload image</button>
+            </>
+          ) : null}
           <br />
-          <button onClick={() => handleSave('64372cb6f8a0a2ee097b08bc')}>Save Image</button>
+          <button
+            onClick={() => handleSave(sessionPrefs.currentSetId)}
+          >
+            {(sessionPrefs.currentSetId !== '') ? `Overwrite image` : `Save as`}
+          </button>
           <br />
-          <button onClick={handleDownload}>Download Image</button>
+          <button onClick={handleDownload}>Download image</button>
           <br />
 
 
@@ -307,6 +373,14 @@ export default function Home({
           min-height: 100vh;
           display: flex;
           flex-direction: column;
+        }
+
+        .setButton {
+          
+        }
+        .setButton.selected {
+          background-color: #222;
+          color: #eee;
         }
 
         main {
