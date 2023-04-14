@@ -41,7 +41,7 @@ const GRIDWIDTH = GRID.DEFAULT_WIDTH
 const GRIDHEIGHT = GRID.DEFAULT_HEIGHT
 
 // CREATE default block set
-let gridRow = Array.from(Array(GRIDWIDTH), () => {
+const gridRow = Array.from(Array(GRIDWIDTH), () => {
   return DEFAULTBLOCK;
 });
 
@@ -49,7 +49,6 @@ const gridArray = Array.from(Array(GRIDHEIGHT), () => {
   // use Array.from to make each row unique
   return Array.from(gridRow);
 });
-
 
 const defaultSessionPrefs = { 
     currentColor: DEFAULTCOLOR,
@@ -67,7 +66,8 @@ export default function Home({
 
   let [sessionPrefs, setSessionPrefs] = useState(defaultSessionPrefs)
 
-  let [gridData, setGridData] = useState(gridArray)
+  // parse and stringify to deep copy array
+  let [gridData, setGridData] = useState(JSON.parse(JSON.stringify(gridArray)))
   let [isHeldActive, setIsHeldActive] = useState(false)
  
   let [viewState, setViewState] = useState('loader')
@@ -80,7 +80,7 @@ export default function Home({
 
 
   function fillSingleBlock(position: position, newColor: string) {
-    setGridData(prevData => {
+    setGridData((prevData: {color: string, opacity: number}[][]) => {
       [...prevData][position.row][position.col] = {color: newColor, opacity: 1}
       return [...prevData]
     })
@@ -149,7 +149,7 @@ export default function Home({
     const canvas = document.getElementById("canvas") as HTMLCanvasElement;
     const ctx = canvas && canvas?.getContext("2d");
 
-    gridData.map((row, index) => {
+    gridData.map((row: {color: string}[], index: number) => {
       for (const block in row) {
         let numBlock = parseInt(block)
         let currentBlock = row[numBlock]
@@ -205,7 +205,6 @@ export default function Home({
 
   // SAVE image to database
   async function handleSave(setId: string) {
-    console.log('handle save', sessionPrefs)
     if (setId !== '') {
       const response = await fetch(`../api/blockSet/update/${setId}`, {
         method: "POST", // or 'PUT'
@@ -224,6 +223,14 @@ export default function Home({
         },
         body: JSON.stringify(gridData)
       });
+      const jsonData = await response.json();
+      await handleLoadSets()
+      setSessionPrefs(prevPrefs => {
+        return {...prevPrefs,
+        currentSetId: jsonData.insertedId
+        }
+      })
+
     }
   }
 
@@ -240,6 +247,14 @@ export default function Home({
       }
     })
   }
+  // DELETE image from database
+  async function handleDelete(setId: string) {
+    
+    const response = await fetch(`../api/blockSet/delete/${setId}`);
+    //const jsonData = await response.json();
+    handleLoadNew()
+    handleLoadSets()
+  }
   
   // LOAD sets from database
   async function handleLoadSets() {
@@ -247,12 +262,10 @@ export default function Home({
     const jsonData = await response.json();
     const parsedData = JSON.parse(JSON.stringify(jsonData))
     setSetsData(parsedData)
-    console.log(parsedData)
-    // return jsonData
   }
 
   function handleLoadNew() {
-    setGridData(gridArray)
+    setGridData(JSON.parse(JSON.stringify(gridArray)))
     setSessionPrefs(prevPrefs => {
       return {...prevPrefs,
       currentSetId: ''
@@ -326,6 +339,8 @@ export default function Home({
               {sessionPrefs.currentSetId}
               <br />
               <button onClick={() => handleLoad(sessionPrefs.currentSetId)}>Reload image</button>
+              <br />
+              <button onClick={() => handleDelete(sessionPrefs.currentSetId)}>DELETE image</button>
             </>
           ) : null}
           <br />
@@ -337,6 +352,8 @@ export default function Home({
           <br />
           <button onClick={handleDownload}>Download image</button>
           <br />
+
+          
 
 
           <Palettes

@@ -7,12 +7,7 @@ export default async (req, res) => {
        const db = client.db("block_paint");
 
        const result = await db
-           .collection("blockSet")
-        //    .updateOne(
-        //     {_id: new ObjectId('64372cb6f8a0a2ee097b08bc')},
-        //     { $set: {blockData: req.body}},
-        //     { upsert: true }
-        //     )
+        .collection("blockSet")
         .insertOne({blockData: req.body})
        
        console.log(`New set created with the following id: ${result.insertedId}`)
