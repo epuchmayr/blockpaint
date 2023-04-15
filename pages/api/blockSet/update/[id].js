@@ -13,7 +13,11 @@ export default async (req, res) => {
             .collection("blockSet")
             .updateOne(
                 {_id: ObjectId(id)},
-                { $set: {grid_data: req.body.grid_data, thumbnail: req.body.thumbnail}}
+                { $set: {
+                    grid_data: req.body.grid_data,
+                    thumbnail: req.body.thumbnail,
+                    set_name: req.body.set_name
+                }}
                 )
        
         console.log(`Set updated with the following id: ${result.upsertedId}`)

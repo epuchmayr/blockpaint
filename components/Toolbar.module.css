@@ -37,14 +37,3 @@ border-right: 1px solid #aaa;
 .eyedrop {
     background-image: url('/images/icons/eyedrop.png');
 }
-
-
-.foregroundColour {
-    padding: 0;
-}
-.foregroundColour::-webkit-color-swatch-wrapper {
-    padding: 0;
-}
-.foregroundColour::-webkit-color-swatch {
-    border: none;
-}

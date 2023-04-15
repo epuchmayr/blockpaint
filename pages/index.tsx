@@ -73,6 +73,7 @@ export default function Home({
     gridData: JSON.parse(JSON.stringify(gridArray)),
     gridWidth: GRIDWIDTH,
     gridHeight: GRIDHEIGHT,
+    setName: ''
   })
   let [isHeldActive, setIsHeldActive] = useState(false)
  
@@ -114,6 +115,24 @@ export default function Home({
     }
   }
 
+  function updateSetData(event: any) {
+    const {name, value} : {name: string, value: string} = event.target
+    setSetData(prevData => ({
+      ...prevData,
+      [name]: value
+    })
+    )
+  }
+
+
+
+  function handlePickerChange(event: ChangeEvent<HTMLInputElement>) {
+    setSessionPrefs(prevPrefs => {
+      return {...prevPrefs,
+      currentColor: event.target?.value
+      }
+    })
+  }
 
   function handleChangeColor(event: any) {
     const targetColor = event.target?.value
@@ -168,15 +187,6 @@ export default function Home({
 
   }, [setData])
 
-
-  function handlePickerChange(event: ChangeEvent<HTMLInputElement>) {
-    setSessionPrefs(prevPrefs => {
-      return {...prevPrefs,
-      currentColor: event.target?.value
-      }
-    })
-  }
-
   function handlePickerBlur(event: FocusEvent<HTMLInputElement>) {
     addColorToHistory(event.target?.value)
   }
@@ -219,7 +229,11 @@ export default function Home({
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({grid_data: setData.gridData, thumbnail: makeEncodedImage()})
+        body: JSON.stringify({
+          grid_data: setData.gridData,
+          thumbnail: makeEncodedImage(),
+          set_name: setData.setName
+        })
       })
       await handleLoadSets()
     } else {
@@ -233,6 +247,7 @@ export default function Home({
           grid_width: setData.gridWidth,
           grid_height: setData.gridHeight,
           thumbnail: makeEncodedImage(),
+          set_name: '',
           created_date: new Date(),
           last_update: new Date(),
           creator: '',
@@ -269,11 +284,12 @@ export default function Home({
 
   // DELETE image from database
   async function handleDelete(setId: string) {
-    
-    const response = await fetch(`../api/blockSet/delete/${setId}`);
-    //const jsonData = await response.json();
-    handleLoadNew()
-    handleLoadSets()
+    if (window.confirm("Are you sure you want to permanently delete this set?")) {
+      await fetch(`../api/blockSet/delete/${setId}`);
+      //const jsonData = await response.json();
+      handleLoadNew()
+      handleLoadSets()
+    }
   }
   
   // LOAD sets from database
@@ -335,8 +351,6 @@ export default function Home({
         <SessionPrefsContext.Provider value={sessionPrefs}>
           <Toolbar
             handleClickTool={handleClickTool}
-            handlePickerChange={handlePickerChange}
-            handlePickerBlur={handlePickerBlur}
           />
         </SessionPrefsContext.Provider>
         
@@ -352,13 +366,13 @@ export default function Home({
           <br />
           {(sessionPrefs.currentSetId !== '') ? (
             <>
-              {sessionPrefs.currentSetId}
+              <input name='setName' value={setData.setName} placeholder={sessionPrefs.currentSetId} onChange={(e) => updateSetData(e)} />
               <br />
               <button onClick={() => handleLoad(sessionPrefs.currentSetId)}>Reload set</button>
-              <br />
+              {` `}
               <button onClick={() => handleDelete(sessionPrefs.currentSetId)}>DELETE set</button>
               <br />
-              <button onClick={handleDownload}>Download set as PNG</button>
+              <button onClick={handleDownload}>Download as PNG</button>
               <br />
               <br />
             </>
@@ -373,6 +387,14 @@ export default function Home({
 
           
 
+          <input
+            className='foregroundColour'
+            name='color'
+            type='color'
+            value={sessionPrefs.currentColor.toString()}
+            onChange={handlePickerChange}
+            onBlur={handlePickerBlur}
+            />
 
           <Palettes
             handleChangeColor={handleChangeColor}
@@ -428,6 +450,17 @@ export default function Home({
         .options-menu {
           border-left: 1px solid #aaa;
         }
+
+
+        .foregroundColour {
+          padding: 0;
+      }
+      .foregroundColour::-webkit-color-swatch-wrapper {
+          padding: 0;
+      }
+      .foregroundColour::-webkit-color-swatch {
+          border: none;
+      }
 
         footer {
           width: 100%;

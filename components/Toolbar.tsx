@@ -37,10 +37,8 @@ function ToolSelectMenu({handleClickTool}:{
 
 
 
-export default function Toolbar({handleClickTool, handlePickerChange, handlePickerBlur}:{
+export default function Toolbar({handleClickTool}:{
         handleClickTool: MouseEventHandler
-        handlePickerChange: ChangeEventHandler
-        handlePickerBlur: FocusEventHandler
     }) {
 
     const sessionPrefs = useContext(SessionPrefsContext);
@@ -49,14 +47,6 @@ export default function Toolbar({handleClickTool, handlePickerChange, handlePick
         <aside className={styles.toolbar}>
             <ToolSelectMenu handleClickTool={handleClickTool} />
         <label>
-            <input
-            className={styles.foregroundColour}
-            name='color'
-            type='color'
-            value={sessionPrefs.currentColor.toString()}
-            onChange={handlePickerChange}
-            onBlur={handlePickerBlur}
-            />
           </label>
         </aside>
     )

@@ -1,0 +1,30 @@
+
+
+.loader {
+  display: flex;
+  height: 69px;
+}
+.setLoader {
+    display: flex;
+    height: 69px;
+    overflow: auto;
+    flex-wrap: wrap;
+}
+.setButton {
+    margin-inline: 4px;
+}
+.setButton img {
+    height: 60px;
+}
+.setButtonSelected {
+  background-color: #222;
+  color: #eee;
+}
+
+.newSetButton {
+  margin-inline: 8px;
+  background-color: lightgreen;
+  img {
+    height: 20px;
+  }
+}
