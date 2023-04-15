@@ -273,7 +273,10 @@ export default function Home({
     const jsonData = await response.json();
     setSetData(prevData => ({
       ...prevData,
-      gridData: jsonData.grid_data
+      gridData: jsonData.grid_data,
+      gridWidth: jsonData.grid_width,
+      gridHeight: jsonData.grid_height,
+      setName: jsonData.set_name
     }))
     setSessionPrefs(prevPrefs => {
       return {...prevPrefs,
