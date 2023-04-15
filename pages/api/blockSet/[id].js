@@ -10,14 +10,14 @@ export default async (req, res) => {
       const client = await clientPromise;
       const db = client.db("block_paint");
 
-      const blockSet = await db
+      const setData = await db
           .collection("blockSet")
           .findOne({_id: ObjectId(id)})
        //    .sort({ metacritic: -1 })
        //    .limit(1)
        //    .toArray();
 
-      res.json(blockSet);
+      res.json(setData);
   } catch (e) {
       console.error(e);
   }

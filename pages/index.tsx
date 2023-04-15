@@ -9,6 +9,7 @@ import { TOOLS, PREFS, GRID } from '../CONSTANTS'
 import Grid from '../components/Grid'
 import Toolbar from '../components/Toolbar'
 import Palettes from '../components/Palettes'
+import SetLoader from '../components/SetLoader'
 
 
 export async function getServerSideProps() {
@@ -59,6 +60,7 @@ const defaultSessionPrefs = {
 
   // SET context to share state with children
 export const SessionPrefsContext = createContext(defaultSessionPrefs);
+export const SetsDataContext = createContext([]);
 
 export default function Home({
   isConnected,
@@ -67,7 +69,11 @@ export default function Home({
   let [sessionPrefs, setSessionPrefs] = useState(defaultSessionPrefs)
 
   // parse and stringify to deep copy array
-  let [gridData, setGridData] = useState(JSON.parse(JSON.stringify(gridArray)))
+  let [setData, setSetData] = useState({
+    gridData: JSON.parse(JSON.stringify(gridArray)),
+    gridWidth: GRIDWIDTH,
+    gridHeight: GRIDHEIGHT,
+  })
   let [isHeldActive, setIsHeldActive] = useState(false)
  
   let [viewState, setViewState] = useState('loader')
@@ -80,9 +86,9 @@ export default function Home({
 
 
   function fillSingleBlock(position: position, newColor: string) {
-    setGridData((prevData: {color: string, opacity: number}[][]) => {
-      [...prevData][position.row][position.col] = {color: newColor, opacity: 1}
-      return [...prevData]
+    setSetData((prevData) => {
+      prevData.gridData[position.row][position.col] = {color: newColor, opacity: 1}
+      return {...prevData}
     })
   }
 
@@ -95,7 +101,7 @@ export default function Home({
     } else if (sessionPrefs.currentTool === TOOLS.EYEDROP) {
       setSessionPrefs(prevPrefs => {
         return {...prevPrefs,
-        currentColor: gridData[position.row][position.col].color
+        currentColor: setData.gridData[position.row][position.col].color
         }
       })
     }
@@ -122,7 +128,6 @@ export default function Home({
 
 
   function addColorToHistory(newColor: string) {
-    console.log(sessionPrefs.colorHistory[0], newColor)
     if (sessionPrefs.colorHistory[0] !== newColor) {
     setSessionPrefs(prevPrefs => {
       if (prevPrefs.colorHistory.length >= PREFS.SWATCH_HISTORY_SIZE) {
@@ -145,16 +150,15 @@ export default function Home({
 
   // UPDATE canvas
   useEffect(() => {
-
     const canvas = document.getElementById("canvas") as HTMLCanvasElement;
     const ctx = canvas && canvas?.getContext("2d");
 
-    gridData.map((row: {color: string}[], index: number) => {
+    setData.gridData.map((row: {color: string}[], index: number) => {
       for (const block in row) {
         let numBlock = parseInt(block)
         let currentBlock = row[numBlock]
         let sizeX = canvas.width / row.length
-        let sizeY = canvas.height / gridData.length
+        let sizeY = canvas.height / setData.gridData.length
         let blockX = numBlock*sizeX
         let blockY = index*sizeY
         ctx!.fillStyle = currentBlock.color;
@@ -162,7 +166,7 @@ export default function Home({
       }
     })
 
-  }, [gridData])
+  }, [setData])
 
 
   function handlePickerChange(event: ChangeEvent<HTMLInputElement>) {
@@ -184,12 +188,16 @@ export default function Home({
     setDownloadImage(true)
   }
 
+  function makeEncodedImage() {
+    const canvas: HTMLCanvasElement = document.getElementById("canvas") as HTMLCanvasElement
+    const encodedImage = canvas!.toDataURL();
+    return encodedImage
+  }
+
   useEffect(() => {
     // https://www.geeksforgeeks.org/how-to-trigger-a-file-download-when-clicking-an-html-button-or-javascript/
     if (!downloadImage) return
-    const canvas: HTMLCanvasElement = document.getElementById("canvas") as HTMLCanvasElement
-    const encodedImage = canvas!.toDataURL();
-    console.log('image base/64', encodedImage)
+    const encodedImage = makeEncodedImage()
  
     var element = document.createElement('a');
     element.setAttribute('href', encodedImage);
@@ -211,17 +219,25 @@ export default function Home({
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(gridData)
-      });
-      // const jsonData = await response.json();
-      // console.log(jsonData);
+        body: JSON.stringify({grid_data: setData.gridData, thumbnail: makeEncodedImage()})
+      })
+      await handleLoadSets()
     } else {
       const response = await fetch(`../api/blockSet/createSet`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(gridData)
+        body: JSON.stringify({
+          grid_data: setData.gridData,
+          grid_width: setData.gridWidth,
+          grid_height: setData.gridHeight,
+          thumbnail: makeEncodedImage(),
+          created_date: new Date(),
+          last_update: new Date(),
+          creator: '',
+          isLocked: false
+        })
       });
       const jsonData = await response.json();
       await handleLoadSets()
@@ -240,13 +256,17 @@ export default function Home({
     
     const response = await fetch(`../api/blockSet/${setId}`);
     const jsonData = await response.json();
-    setGridData(jsonData.blockData)
+    setSetData(prevData => ({
+      ...prevData,
+      gridData: jsonData.grid_data
+    }))
     setSessionPrefs(prevPrefs => {
       return {...prevPrefs,
       currentSetId: setId
       }
     })
   }
+
   // DELETE image from database
   async function handleDelete(setId: string) {
     
@@ -265,7 +285,10 @@ export default function Home({
   }
 
   function handleLoadNew() {
-    setGridData(JSON.parse(JSON.stringify(gridArray)))
+    setSetData(prevData => ({
+      ...prevData,
+      gridData: JSON.parse(JSON.stringify(gridArray))
+    }))
     setSessionPrefs(prevPrefs => {
       return {...prevPrefs,
       currentSetId: ''
@@ -298,18 +321,11 @@ export default function Home({
 
 
       {(viewState === 'loader') ? (
-        <div className='setLoader'>
-        <button onClick={() => handleLoadNew()}>Create new set</button>
-          {setsData.map((set: {_id: string}, index) => {
-            return (
-              <button
-                key={set._id}
-                className={`setButton ${(sessionPrefs.currentSetId === set._id) ? `selected` : undefined}`}
-                onClick={() => handleLoad(set._id)}
-              >{`${set._id}`}</button>
-            )
-          })}
-        </div>
+        <SessionPrefsContext.Provider value={sessionPrefs}>
+          <SetsDataContext.Provider value={setsData}>
+            <SetLoader handleLoadNew={handleLoadNew} handleLoad={handleLoad} />
+          </SetsDataContext.Provider>
+        </SessionPrefsContext.Provider>
       ) : (
         <h2 className="subtitle"></h2>
       )}
@@ -325,7 +341,7 @@ export default function Home({
         </SessionPrefsContext.Provider>
         
         <div className='artboard'>
-          <Grid gridData={gridData} handleMouseDown={handleMouseDown} handleMouseEnter={handleMouseEnter} />
+          <Grid gridData={setData.gridData} handleMouseDown={handleMouseDown} handleMouseEnter={handleMouseEnter} />
         </div>
 
         <aside className='options-menu'>
@@ -338,19 +354,21 @@ export default function Home({
             <>
               {sessionPrefs.currentSetId}
               <br />
-              <button onClick={() => handleLoad(sessionPrefs.currentSetId)}>Reload image</button>
+              <button onClick={() => handleLoad(sessionPrefs.currentSetId)}>Reload set</button>
               <br />
-              <button onClick={() => handleDelete(sessionPrefs.currentSetId)}>DELETE image</button>
+              <button onClick={() => handleDelete(sessionPrefs.currentSetId)}>DELETE set</button>
+              <br />
+              <button onClick={handleDownload}>Download set as PNG</button>
+              <br />
+              <br />
             </>
           ) : null}
-          <br />
           <button
             onClick={() => handleSave(sessionPrefs.currentSetId)}
           >
-            {(sessionPrefs.currentSetId !== '') ? `Overwrite image` : `Save as`}
+            {(sessionPrefs.currentSetId !== '') ? `Overwrite set` : `Save as a new set`}
           </button>
           <br />
-          <button onClick={handleDownload}>Download image</button>
           <br />
 
           
@@ -390,14 +408,6 @@ export default function Home({
           min-height: 100vh;
           display: flex;
           flex-direction: column;
-        }
-
-        .setButton {
-          
-        }
-        .setButton.selected {
-          background-color: #222;
-          color: #eee;
         }
 
         main {

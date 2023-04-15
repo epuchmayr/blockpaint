@@ -1,0 +1,12 @@
+
+
+.setLoader {
+          
+}
+.setButton img {
+    height: 60px;;
+}
+.setButtonSelected {
+  background-color: #222;
+  color: #eee;
+}
