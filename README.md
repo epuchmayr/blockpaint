@@ -23,11 +23,19 @@ It should be easy to start using based on common ideas
 It should implement a system not commonly seen in that particular pattern
 It should use modern frameworks and techniques
 
-#### What's under the hood
+### What's under the hood
 
-This is a React app built in nextjs. It uses Mongodb to store and serve the images and data.
+This is a typed React app built in nextjs. It uses Mongodb to store and serve the images and data. It's deployed to production using Vercel
 
-#### Why
+#### Other stuff
+
+React provider for state sharing and useEffect for hooks
+
+nextjs api endpoints
+
+css flex & grid
+
+## Why
 
 After finishing the updated [react tic-tac-toe](https://react.dev/learn/tutorial-tic-tac-toe) tutorial I wanted to greatly extend a simple idea into something more exciting.
 
@@ -70,6 +78,8 @@ ability to name
 ## what's next (todo)
 
 graphql layer
+
+AI image API, generate tags, find text
 
 realtime updates? (sockets)
 

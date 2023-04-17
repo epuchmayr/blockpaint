@@ -1,7 +1,7 @@
 import Head from 'next/head'
 import clientPromise from '../lib/mongodb'
 import { InferGetServerSidePropsType } from 'next'
-import { ChangeEvent, FocusEvent, MouseEventHandler, useEffect, useState, createContext } from 'react'
+import { ChangeEvent, FocusEvent, BaseSyntheticEvent, useEffect, useState, createContext } from 'react'
 
 
 import { TOOLS, PREFS, GRID } from '../CONSTANTS'
@@ -94,7 +94,7 @@ export default function Home({
   }
 
 
-  function handleMouseDown(event: any, position: position) {
+  function handleMouseDown(event: MouseEvent, position: position) {
     if (sessionPrefs.currentTool === TOOLS.DRAW) {
       fillSingleBlock(position, sessionPrefs.currentColor)
     } else if (sessionPrefs.currentTool === TOOLS.ERASE) {
@@ -109,13 +109,13 @@ export default function Home({
   }
 
 
-  function handleMouseEnter(event: MouseEventHandler, position: position) {
+  function handleMouseEnter(event: MouseEvent, position: position) {
     if (isHeldActive) {
       handleMouseDown(event, position)
     }
   }
 
-  function updateSetData(event: any) {
+  function updateSetData(event: BaseSyntheticEvent) {
     const {name, value} : {name: string, value: string} = event.target
     setSetData(prevData => ({
       ...prevData,
@@ -129,13 +129,13 @@ export default function Home({
   function handlePickerChange(event: ChangeEvent<HTMLInputElement>) {
     setSessionPrefs(prevPrefs => {
       return {...prevPrefs,
-      currentColor: event.target?.value
+      currentColor: event.target.value
       }
     })
   }
 
-  function handleChangeColor(event: any) {
-    const targetColor = event.target?.value
+  function handleChangeColor(event: BaseSyntheticEvent) {
+    const targetColor = event.target.value
     setSessionPrefs(prevPrefs => {
       return {...prevPrefs,
       currentColor: targetColor
@@ -159,10 +159,10 @@ export default function Home({
   }
 
 
-  function handleClickTool(event: any) {
+  function handleClickTool(event: BaseSyntheticEvent) {
     setSessionPrefs(prevPrefs => {
       return {...prevPrefs,
-      currentTool: event.target?.value
+      currentTool: event.target.value
       }
     })
   }
@@ -188,7 +188,7 @@ export default function Home({
   }, [setData])
 
   function handlePickerBlur(event: FocusEvent<HTMLInputElement>) {
-    addColorToHistory(event.target?.value)
+    addColorToHistory(event.target.value)
   }
 
   // DOWNLOAD image from canvas
