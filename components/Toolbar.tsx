@@ -1,6 +1,6 @@
 import { ChangeEventHandler, FocusEventHandler, MouseEventHandler,useContext } from 'react'
 import { TOOLS } from '../CONSTANTS'
-import styles from './Toolbar.module.css'
+import styles from './Toolbar.module.scss'
 
 import { SessionPrefsContext } from '../pages/index'
 

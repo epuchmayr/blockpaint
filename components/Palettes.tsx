@@ -1,5 +1,5 @@
 import { MouseEventHandler, useContext } from 'react'
-import styles from './Palettes.module.css'
+import styles from './Palettes.module.scss'
 import Palette from '../components/Palette'
 import { SWATCHES } from '../CONSTANTS'
 

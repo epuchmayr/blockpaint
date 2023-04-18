@@ -1,5 +1,5 @@
 import { MouseEventHandler } from 'react'
-import styles from './Palette.module.css'
+import styles from './Palette.module.scss'
 
 
 export default function Palette({

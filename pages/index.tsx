@@ -465,9 +465,13 @@ export default function Home({
     @media (max-width: 900px) {
       main {
         flex-direction: column;
+        overflow: auto;
       }
       .artboard {
         height: auto;
+      }
+      .options-menu {
+        min-height: 200px;
       }
     }
 
