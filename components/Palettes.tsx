@@ -17,15 +17,20 @@ export default function Palettes({
     return (
     <div className={styles.palettes}>
         <Palette
-            title={'Basic Colours'}
-            swatches={SWATCHES.DEFAULT}
-            clickHandler={handleChangeColor}
-          />
-        <Palette
             title={'Colour History'}
             swatches={sessionPrefs.colorHistory}
             clickHandler={handleChangeColor}
         />
+        {SWATCHES.map((swatch, index) => {
+            return (
+                <Palette
+                    key={index}
+                    title={swatch.name}
+                    swatches={swatch.colors}
+                    clickHandler={handleChangeColor}
+                />
+            )
+        })}
     </div>
     )
 }

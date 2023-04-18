@@ -1,8 +1,15 @@
 
+.palette {
+    border-top: 1px solid #aaa;
+    padding-inline: .5rem;
+}
+.title {
+    font-size: 1rem;
+}
 .swatches {
     display: grid;
     grid-template-columns: repeat(6, 1fr);
-    padding-block: 10px;
+    padding-bottom: 10px;
 }
 .swatch {
     border: 1px solid lightgrey;

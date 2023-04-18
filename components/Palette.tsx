@@ -14,8 +14,8 @@ export default function Palette({
 
 
     return (
-    <div className="palette">
-        <label>{title}</label>
+    <div className={styles.palette}>
+        <label className={styles.title}>{title}</label>
         <div className={styles.swatches}>
         {swatches.map((value, index) => {
             return (<button

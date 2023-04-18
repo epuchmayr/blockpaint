@@ -437,23 +437,39 @@ export default function Home({
 
         main {
           display: flex;
-          flex: 1;
+          flex: auto;
           flex-direction: row;
-          justify-content: space-between;
           width: 100%;
+          height: 10px;
+
+          overflow:hidden;
         }
 
         aside {
-          padding: .5rem;
+          overflow: auto;
         }
         .artboard {
-          align-self: center;
-          flex: none;
+          align-items: center;
+          flex: 1 0 auto;
+
+          display: flex;
+          justify-content: center;
+          overflow: auto;
+          height: 100%;
         }
         .options-menu {
           border-left: 1px solid #aaa;
         }
 
+        
+    @media (max-width: 900px) {
+      main {
+        flex-direction: column;
+      }
+      .artboard {
+        height: auto;
+      }
+    }
 
         .foregroundColour {
           padding: 0;

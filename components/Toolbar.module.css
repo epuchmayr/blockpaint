@@ -37,3 +37,8 @@ border-right: 1px solid #aaa;
 .eyedrop {
     background-image: url('/images/icons/eyedrop.png');
 }
+@media (max-width: 900px) {
+    .toolSelectMenu {
+        display: flex;
+    }
+}
