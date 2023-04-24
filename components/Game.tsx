@@ -10,7 +10,6 @@ export default function Game({handleBack}: {handleBack: MouseEventHandler}) {
 
     const playerPieceReact = useRef<Konva.Rect>(null)
 
-
     const setData = useContext(SetDataContext);
 
     const [collision, setCollision] = useState(false)

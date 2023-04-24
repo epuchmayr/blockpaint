@@ -59,11 +59,22 @@ const defaultSessionPrefs = {
     currentSetId: '',
     colorHistory: [DEFAULTCOLOR]
   }
+  interface SingleDataContext {
+    gridData: [],
+    gridWidth: Number,
+    gridHeight: Number,
+    setName: String
+  }
 
   // SET context to share state with children
 export const SessionPrefsContext = createContext(defaultSessionPrefs);
 export const AllSetsDataContext = createContext([]);
-export const SetDataContext = createContext({gridData: Array<number>});
+export const SetDataContext = createContext<SingleDataContext>({
+  gridData: [],
+  gridWidth: GRIDWIDTH,
+  gridHeight: GRIDHEIGHT,
+  setName: ''
+});
 
 export default function Home({
   isConnected,
@@ -78,6 +89,8 @@ export default function Home({
     gridHeight: GRIDHEIGHT,
     setName: ''
   })
+
+  
   let [isHeldActive, setIsHeldActive] = useState(false)
  
   let [viewState, setViewState] = useState(APPSTATE.LOADER)
