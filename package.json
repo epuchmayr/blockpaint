@@ -6,10 +6,13 @@
     "start": "next start"
   },
   "dependencies": {
+    "canvas": "^2.11.2",
+    "konva": "^9.0.1",
     "mongodb": "^4.8.1",
     "next": "latest",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "react-konva": "^18.2.7"
   },
   "devDependencies": {
     "@types/node": "18.7.5",

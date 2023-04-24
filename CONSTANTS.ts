@@ -1,4 +1,12 @@
+import { createRouteLoader } from "next/dist/client/route-loader"
 
+export const APPSTATE: {
+    [index: string]: string
+} = {
+    LOADER: 'loader',
+    CREATOR: 'creator',
+    GAMING: 'gaming'
+}
 
 export const TOOLS: {
     [index: string]: string

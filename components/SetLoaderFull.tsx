@@ -1,9 +1,9 @@
 import { useContext } from 'react'
-import styles from './SetLoader.module.scss'
+import styles from './SetLoaderFull.module.scss'
 
 import { SessionPrefsContext, AllSetsDataContext } from '../pages'
 
-export default function SetLoader({
+export default function SetLoaderFull({
     handleLoadNew,
     handleLoad
 }:{

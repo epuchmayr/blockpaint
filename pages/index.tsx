@@ -4,12 +4,14 @@ import { InferGetServerSidePropsType } from 'next'
 import { ChangeEvent, FocusEvent, BaseSyntheticEvent, useEffect, useState, createContext } from 'react'
 
 
-import { TOOLS, PREFS, GRID } from '../CONSTANTS'
+import { TOOLS, PREFS, GRID, APPSTATE } from '../CONSTANTS'
 
 import Grid from '../components/Grid'
 import Toolbar from '../components/Toolbar'
 import Palettes from '../components/Palettes'
 import SetLoader from '../components/SetLoader'
+import SetLoaderFull from '../components/SetLoaderFull'
+import Game from '../components/Game'
 
 
 export async function getServerSideProps() {
@@ -60,7 +62,8 @@ const defaultSessionPrefs = {
 
   // SET context to share state with children
 export const SessionPrefsContext = createContext(defaultSessionPrefs);
-export const SetsDataContext = createContext([]);
+export const AllSetsDataContext = createContext([]);
+export const SetDataContext = createContext({gridData: Array<number>});
 
 export default function Home({
   isConnected,
@@ -77,7 +80,7 @@ export default function Home({
   })
   let [isHeldActive, setIsHeldActive] = useState(false)
  
-  let [viewState, setViewState] = useState('loader')
+  let [viewState, setViewState] = useState(APPSTATE.LOADER)
 
   let [setsData, setSetsData] = useState([])
 
@@ -169,6 +172,7 @@ export default function Home({
 
   // UPDATE canvas
   useEffect(() => {
+    if(viewState !== APPSTATE.CREATOR) return
     const canvas = document.getElementById("canvas") as HTMLCanvasElement;
     const ctx = canvas && canvas?.getContext("2d");
 
@@ -232,7 +236,8 @@ export default function Home({
         body: JSON.stringify({
           grid_data: setData.gridData,
           thumbnail: makeEncodedImage(),
-          set_name: setData.setName
+          set_name: setData.setName,
+          last_update: new Date(),
         })
       })
       await handleLoadSets()
@@ -306,13 +311,18 @@ export default function Home({
   function handleLoadNew() {
     setSetData(prevData => ({
       ...prevData,
-      gridData: JSON.parse(JSON.stringify(gridArray))
+      gridData: JSON.parse(JSON.stringify(gridArray)),
+      setName: ''
     }))
-    setSessionPrefs(prevPrefs => {
-      return {...prevPrefs,
+    setSessionPrefs(prevPrefs => ({
+      ...prevPrefs,
       currentSetId: ''
-      }
-    })
+      })
+    )
+  }
+
+  function handleSetMode(newState: string) {
+    setViewState(newState)
   }
 
   useEffect(() => {
@@ -339,15 +349,22 @@ export default function Home({
       </header>
 
 
-      {(viewState === 'loader') ? (
+      {(viewState === APPSTATE.LOADER) && (
         <SessionPrefsContext.Provider value={sessionPrefs}>
-          <SetsDataContext.Provider value={setsData}>
-            <SetLoader handleLoadNew={handleLoadNew} handleLoad={handleLoad} />
-          </SetsDataContext.Provider>
+          <AllSetsDataContext.Provider value={setsData}>
+            <SetLoaderFull handleLoadNew={handleLoadNew} handleLoad={(e: any) => {handleLoad(e);handleSetMode(APPSTATE.CREATOR)}} />
+          </AllSetsDataContext.Provider>
         </SessionPrefsContext.Provider>
-      ) : (
-        <h2 className="subtitle"></h2>
       )}
+
+      {(viewState === APPSTATE.CREATOR) && (
+        <>
+        <SessionPrefsContext.Provider value={sessionPrefs}>
+          <AllSetsDataContext.Provider value={setsData}>
+            <SetLoader handleLoadNew={handleLoadNew} handleLoad={handleLoad} />
+          </AllSetsDataContext.Provider>
+        </SessionPrefsContext.Provider>
+          <button onClick={() => handleSetMode(APPSTATE.LOADER)}>Full Loader</button>
       
       <main>
 
@@ -403,8 +420,23 @@ export default function Home({
             handleChangeColor={handleChangeColor}
           />
 
+
+          <button onClick={() => handleSetMode(APPSTATE.GAMING)}>Game it</button>
         </aside>
       </main>
+      </>
+      )}
+
+      {(viewState === APPSTATE.GAMING) && (
+        
+        <>
+        <SessionPrefsContext.Provider value={sessionPrefs}>
+          <SetDataContext.Provider value={setData}>
+            <Game handleBack={() => handleSetMode(APPSTATE.CREATOR)} />
+          </SetDataContext.Provider>
+        </SessionPrefsContext.Provider>
+        </>
+      )}
 
       <footer>
       </footer>

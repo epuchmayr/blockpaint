@@ -16,7 +16,8 @@ export default async (req, res) => {
                 { $set: {
                     grid_data: req.body.grid_data,
                     thumbnail: req.body.thumbnail,
-                    set_name: req.body.set_name
+                    set_name: req.body.set_name,
+                    last_update: req.body.last_update,
                 }}
                 )
        
