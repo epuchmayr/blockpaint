@@ -1,5 +1,5 @@
-import { useContext, ReactElement, DragEvent, useState, useEffect, useRef, MutableRefObject, BaseSyntheticEvent, MouseEventHandler } from 'react';
-import { Stage, Layer, Rect, Text, KonvaNodeComponent } from 'react-konva';
+import { useContext, ReactElement, useState, useEffect, useRef, MouseEventHandler } from 'react';
+import { Stage, Layer, Rect, Text } from 'react-konva';
 import Konva from 'konva'
 import styles from './Game.module.scss'
 
