@@ -6,10 +6,12 @@
     "start": "next start"
   },
   "dependencies": {
+    "@pixi/react": "^7.0.3",
     "canvas": "^2.11.2",
     "konva": "^9.0.1",
     "mongodb": "^4.8.1",
     "next": "latest",
+    "pixi.js": "^7.2.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-konva": "^18.2.7"
