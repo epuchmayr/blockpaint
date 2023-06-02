@@ -1,6 +1,7 @@
 import { useContext, ReactElement, useState, useEffect, useRef, MouseEventHandler } from 'react';
 import { Stage, Layer, Rect, Text } from 'react-konva';
 import Konva from 'konva'
+import Confetti from 'react-confetti'
 import styles from './Game.module.scss'
 
 import { SetDataContext } from '../pages'
@@ -221,6 +222,13 @@ export default function Game({handleBack}: {handleBack: MouseEventHandler}) {
 
         <div className={styles.game}>
             <div className={styles.board}>
+            {(endGame && !collision) && (
+                <Confetti
+                className='confetti'
+                width={canvasWidth}
+                height={canvasHeight}
+                />
+            )}
                 <Stage
                 width={canvasWidth}
                 height={canvasHeight}
@@ -236,7 +244,7 @@ export default function Game({handleBack}: {handleBack: MouseEventHandler}) {
                         {renderBoard()}
                         <Text text={`Collision detected: ${collision}`} />
                         
-                            <Text
+                        <Text
                             x={120}
                             y={15}
                             fill='#000'
@@ -244,7 +252,8 @@ export default function Game({handleBack}: {handleBack: MouseEventHandler}) {
                             strokeWidth={5}
                             fillAfterStrokeEnabled={true}
                             fontSize={30}
-                            text={(endGame) ? `YOU WIN!` : (collision) ? `HIT DETECTED` : ``} />
+                            text={(endGame) ? `YOU WIN!` : (collision) ? `HIT DETECTED` : ``}
+                            />
                     </Layer>
                 </Stage>
             </div>

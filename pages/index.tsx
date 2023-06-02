@@ -3,7 +3,6 @@ import clientPromise from '../lib/mongodb'
 import { InferGetServerSidePropsType } from 'next'
 import { ChangeEvent, FocusEvent, BaseSyntheticEvent, useEffect, useState, createContext } from 'react'
 
-
 import { TOOLS, PREFS, GRID, APPSTATE } from '../CONSTANTS'
 
 import Grid from '../components/Grid'
@@ -332,6 +331,7 @@ export default function Home({
       currentSetId: ''
       })
     )
+    handleSetMode(APPSTATE.CREATOR)
   }
 
   function handleSetMode(newState: string) {
@@ -374,10 +374,9 @@ export default function Home({
         <>
         <SessionPrefsContext.Provider value={sessionPrefs}>
           <AllSetsDataContext.Provider value={setsData}>
-            <SetLoader handleLoadNew={handleLoadNew} handleLoad={handleLoad} />
+            <SetLoader handleSetMode={handleSetMode} handleLoadNew={handleLoadNew} handleLoad={handleLoad} />
           </AllSetsDataContext.Provider>
         </SessionPrefsContext.Provider>
-          <button onClick={() => handleSetMode(APPSTATE.LOADER)}>Full Loader</button>
       
       <main>
 
@@ -579,6 +578,10 @@ export default function Home({
 
         * {
           box-sizing: border-box;
+        }
+
+        button {
+          cursor: pointer;
         }
       `}</style>
     </div>

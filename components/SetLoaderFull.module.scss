@@ -2,14 +2,23 @@
 
 .loader {
   display: flex;
+  flex-direction: column;
+  max-width: 900px;
+  margin-inline: auto;
+  height: 100px;
+  flex: 1 1 auto;
 }
 .setLoader {
     display: flex;
     overflow: auto;
     flex-wrap: wrap;
+    justify-content: center;
+    min-height: 150px;
+    flex: 0 1 auto;
+    margin-block: 3rem;
 }
 .setButton {
-    margin-inline: 4px;
+    margin: 4px;
 }
 .setButton img {
     height: 100px;
@@ -22,6 +31,11 @@
 .newSetButton {
   margin-inline: 8px;
   background-color: lightgreen;
+  width: 120px;
+  height: 120px;
+  align-self: center;
+  border-radius: 10px;
+
   img {
     height: 20px;
   }

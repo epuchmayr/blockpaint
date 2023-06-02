@@ -2,7 +2,8 @@
 
 .loader {
   display: flex;
-  height: 69px;
+  height: 72px;
+  border-bottom: 2px solid
 }
 .setLoader {
     display: flex;
@@ -21,9 +22,21 @@
   color: #eee;
 }
 
-.newSetButton {
+.actions {
   margin-inline: 8px;
+  display: flex;
+  height: 69px;
+}
+
+.newSetButton {
   background-color: lightgreen;
+  img {
+    height: 20px;
+  }
+}
+
+.backButton {
+  background-color: lightblue;
   img {
     height: 20px;
   }
