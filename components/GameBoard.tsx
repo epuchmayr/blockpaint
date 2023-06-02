@@ -1,6 +1,4 @@
 import { useContext, ReactElement, useCallback, useState, useEffect, useRef, MouseEventHandler } from 'react'
-import * as PIXI from 'pixi.js'
-import { Stage, Graphics, Sprite, Text } from '@pixi/react'
 
 import { SetDataContext } from '../pages'
 
