@@ -4,11 +4,11 @@ if (
     !process.env.LD_LIBRARY_PATH.includes(
       `${process.env.PWD}/node_modules/canvas/build/Release:`,
     )
-  ) {
+) {
     process.env.LD_LIBRARY_PATH = `${
-      process.env.PWD
+        process.env.PWD
     }/node_modules/canvas/build/Release:${process.env.LD_LIBRARY_PATH || ''}`;
-  }
+}
   
 
 module.exports = {
