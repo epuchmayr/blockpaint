@@ -6,7 +6,7 @@
     "start": "next start"
   },
   "dependencies": {
-    "canvas": "^2.11.0",
+    "canvas": "2.11.0",
     "konva": "^9.1.0",
     "mongodb": "^4.8.1",
     "next": "latest",
