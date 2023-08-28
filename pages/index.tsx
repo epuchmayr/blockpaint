@@ -59,7 +59,7 @@ const defaultSessionPrefs = {
     colorHistory: [DEFAULTCOLOR]
   }
   interface SingleDataContext {
-    id: Number | undefined,
+    id: string | undefined,
     gridData: [],
     gridWidth: Number,
     gridHeight: Number,
