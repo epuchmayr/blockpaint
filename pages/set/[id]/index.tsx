@@ -274,7 +274,7 @@ export default function Set({
   async function handleLoad(setId: string) {
     // const response = await fetch(`../api/blockSet/${setId}`);
     // const jsonData = await response.json();
-    console.log('new load', setData)
+    // console.log('new load', setData)
     
     setNewSetData((prevData) => ({
       ...prevData,

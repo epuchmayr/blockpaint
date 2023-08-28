@@ -1,7 +1,6 @@
-import Head from "next/head";
 import Link from "next/link";
 import { GetStaticProps, GetStaticPaths } from "next";
-import { getAllSetIds, getSetData } from "../../../lib/set";
+import { getAllSetIds, getSetData ,getSetsData } from "../../../lib/set";
 
 import styles from './index.module.scss'
 
@@ -20,9 +19,7 @@ import Grid from "../../../components/Grid";
 import Toolbar from "../../../components/Toolbar";
 import Palettes from "../../../components/Palettes";
 import SetLoader from "../../../components/SetLoader";
-import SetLoaderFull from "../../../components/SetLoaderFull";
-import Game from "../../../components/Game";
-import LayoutCreator from "../../../components/Layout";
+import Layout from "../../../components/Layout";
 
 // SET constants
 const DEFAULTCOLOR = GRID.DEFAULT_COLOR;
@@ -65,6 +62,7 @@ export const SetDataContext = createContext<SingleDataContext>({
 
 export default function Set({
   setData,
+  setsData
 }: {
   setData: {
     _id: string;
@@ -78,22 +76,24 @@ export default function Set({
     isLocked: boolean;
     set_name: string;
   };
+  setsData: []
 }) {
   let [sessionPrefs, setSessionPrefs] = useState({...defaultSessionPrefs, currentSetId: setData._id});
 
   // parse and stringify to deep copy array
   let [newSetData, setNewSetData] = useState({
-    gridData: Array.from(setData.grid_data),
+    gridData: JSON.parse(JSON.stringify(setData.grid_data)),
     gridWidth: setData.grid_width,
     gridHeight: setData.grid_height,
     setName: setData.set_name || "",
+    createdDate: setData.created_date,
+    lastUpdate: setData.last_update,
+    creator: setData.creator,
+    isLocked: setData.isLocked,
+    id: setData._id
   });
 
   let [isHeldActive, setIsHeldActive] = useState(false);
-
-  let [viewState, setViewState] = useState(APPSTATE.LOADER);
-
-  let [setsData, setSetsData] = useState([]);
 
   interface position {
     row: number;
@@ -119,7 +119,7 @@ export default function Set({
       setSessionPrefs((prevPrefs) => {
         return {
           ...prevPrefs,
-          currentColor: setData.grid_data[position.row][position.col].color,
+          currentColor: newSetData.gridData[position.row][position.col].color,
         };
       });
     }
@@ -178,7 +178,7 @@ export default function Set({
     const canvas = document.getElementById("canvas") as HTMLCanvasElement;
     const ctx = canvas && canvas?.getContext("2d");
 
-    setData.grid_data.map((row: { color: string }[], index: number) => {
+    newSetData.gridData.map((row: { color: string }[], index: number) => {
       for (const block in row) {
         let numBlock = parseInt(block);
         let currentBlock = row[numBlock];
@@ -243,6 +243,7 @@ export default function Set({
         }),
       });
       // await handleLoadSets()
+
     } else {
       const response = await fetch(`../api/blockSet/createSet`, {
         method: "POST",
@@ -271,18 +272,26 @@ export default function Set({
 
   // LOAD image from database
   async function handleLoad(setId: string) {
-    const response = await fetch(`../api/blockSet/${setId}`);
-    const jsonData = await response.json();
+    // const response = await fetch(`../api/blockSet/${setId}`);
+    // const jsonData = await response.json();
+    console.log('new load', setData)
+    
     setNewSetData((prevData) => ({
       ...prevData,
-      gridData: jsonData.grid_data,
-      gridWidth: jsonData.grid_width,
-      gridHeight: jsonData.grid_height,
-      setName: jsonData.set_name,
+      gridData: JSON.parse(JSON.stringify(setData.grid_data)),
+      gridWidth: setData.grid_width,
+      gridHeight: setData.grid_height,
+      setName: setData.set_name || "",
+      createdDate: setData.created_date,
+      lastUpdate: setData.last_update,
+      creator: setData.creator,
+      isLocked: setData.isLocked,
+      id: setData._id
     }));
     setSessionPrefs((prevPrefs) => {
-      return { ...prevPrefs, currentSetId: setId };
+      return { ...prevPrefs, currentSetId: setData._id };
     });
+    
   }
 
   // DELETE image from database
@@ -313,37 +322,31 @@ export default function Set({
       ...prevPrefs,
       currentSetId: "",
     }));
-    handleSetMode(APPSTATE.CREATOR);
   }
 
-  function handleSetMode(newState: string) {
-    setViewState(newState);
-  }
-
-  // useEffect(() => {
-  //   handleLoadSets()
-  //   if (sessionPrefs.currentSetId !== '') {
-  //     handleLoad(sessionPrefs.currentSetId)
-  //   }
-  // }, [])
+  useEffect(() => {
+    // handleLoadSets()
+    if (sessionPrefs.currentSetId !== '') {
+      handleLoad(sessionPrefs.currentSetId)
+    }
+  }, [setData])
 
   return (
     <>
-      <LayoutCreator>
-        <div className={styles.container}
+      <Layout>
+
+        <SessionPrefsContext.Provider value={sessionPrefs}>
+          <AllSetsDataContext.Provider value={setsData}>
+            <SetLoader handleLoadNew={handleLoadNew} />
+          </AllSetsDataContext.Provider>
+        </SessionPrefsContext.Provider>
+
+
+        <div className={styles.main}
           onMouseDown={() => setIsHeldActive(true)}
           onMouseUp={() => setIsHeldActive(false)}
           onMouseEnter={() => setIsHeldActive(false)}>
-        <Head>
-          <title>title</title>
-        </Head>
-        {/* <SessionPrefsContext.Provider value={sessionPrefs}>
-          <AllSetsDataContext.Provider value={setsData}>
-            <SetLoader handleSetMode={handleSetMode} handleLoadNew={handleLoadNew} handleLoad={handleLoad} />
-          </AllSetsDataContext.Provider>
-        </SessionPrefsContext.Provider> */}
 
-        <main className={styles.main}>
           <SessionPrefsContext.Provider value={sessionPrefs}>
             <Toolbar handleClickTool={handleClickTool} />
           </SessionPrefsContext.Provider>
@@ -359,21 +362,28 @@ export default function Set({
           </div>
 
           <aside className={styles.optionsMenu}>
-            ID: {setData._id}
+            ID: {newSetData.id}
             <br />
-            Name: {setData.set_name || "unnamed"}
+            Set name: {newSetData.setName || "[unnamed]"}
             <br />
-            Created: {setData.created_date}
+            Created: {new Date(newSetData.createdDate).toUTCString()}
             <br />
-            Updated: {setData.last_update}
+            Updated: {new Date(newSetData.lastUpdate).toUTCString()}
             <br />
-            Dimensions: {setData.grid_width} x {setData.grid_height}
+            Dimensions: {newSetData.gridWidth} x {newSetData.gridHeight}
             <br />
-            Creator: {setData.creator || "unnamed"}
+            Creator: {newSetData.creator || "[unknown]"}
             <br />
-            isLocked: {setData.isLocked.toString()}
+            isLocked: {newSetData.isLocked.toString()}
+            <br />
+            <Link
+                href={`/game/${setData._id}`} as={`/game/${setData._id}`}>
+                Play {setData.set_name || '[unnamed]'}
+            </Link><br />
+            {(JSON.stringify(setData.grid_data) === JSON.stringify(newSetData.gridData)) ? '' : '(save changes to update play)'}
             <br />
             <p>{`${setData.grid_width} x ${setData.grid_height}`}</p>
+
             <canvas id="canvas" width="150" height="150">
               canvas
             </canvas>
@@ -400,8 +410,8 @@ export default function Set({
             ) : null}
             <button onClick={() => handleSave(sessionPrefs.currentSetId)}>
               {sessionPrefs.currentSetId !== ""
-                ? `Overwrite set`
-                : `Save as a new set`}
+                ? `Save changes`
+                : `Save as a new`}
             </button>
             <br />
             <br />
@@ -414,20 +424,11 @@ export default function Set({
               onBlur={handlePickerBlur}
             />
             <Palettes handleChangeColor={handleChangeColor} />
-            <button onClick={() => handleSetMode(APPSTATE.GAMING)}>
-              Game it
-            </button>
-
-            <Link
-                href={`/game/${setData._id}`} as={`/game/${setData._id}`}>
-                {setData.set_name || 'unnamed'}
-            </Link>
 
 
           </aside>
-        </main>
         </div>
-      </LayoutCreator>
+      </Layout>
     </>
   );
 }
@@ -442,9 +443,11 @@ export const getStaticPaths: GetStaticPaths = async () => {
 
 export const getStaticProps: GetStaticProps = async ({ params }) => {
   const setData = await getSetData(params?.id as string);
+  const setsData = await getSetsData();
   return {
     props: {
       setData,
+      setsData,
     },
   };
 };
