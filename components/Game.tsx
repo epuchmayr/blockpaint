@@ -8,7 +8,7 @@ import Link from "next/link";
 import { SetDataContext } from '../pages'
 import { KonvaEventObject } from 'konva/lib/Node';
 
-export default function Game({handleBack}: {handleBack: MouseEventHandler}) {
+export default function Game() {
 
     const playerPieceReact = useRef<Konva.Rect>(null)
 

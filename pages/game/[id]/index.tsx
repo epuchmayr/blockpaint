@@ -59,7 +59,7 @@ export default function Set({
         
         <>
           <SetDataContext.Provider value={gameData}>
-            <Game handleBack={() => handleSetMode(APPSTATE.CREATOR)}  />
+            <Game />
           </SetDataContext.Provider>
         </>
 
