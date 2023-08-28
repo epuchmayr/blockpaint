@@ -11,11 +11,31 @@
     overflow: auto;
     flex-wrap: wrap;
 }
+
+.setButton,
+.backButton,
+.newSetButton {
+  border-radius: 5px;
+  padding: 4px;
+    margin: 4px;
+    text-align: center;
+    text-decoration: none;
+    font-size: .8rem;
+}
+
+
 .setButton {
-    margin-inline: 4px;
+  background-color: #fafafe;
 }
 .setButton img {
-    height: 44px;
+  box-shadow: 0 0 5px lightgray;
+    height: 32px;
+}
+.setButton:hover {
+  background-color: #8383a8;
+}
+.setButton:active {
+  background-color: #50506b;
 }
 .setButtonSelected {
   background-color: #222;

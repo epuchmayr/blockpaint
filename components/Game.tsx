@@ -3,6 +3,7 @@ import { Stage, Layer, Rect, Text } from 'react-konva';
 import Konva from 'konva'
 import Confetti from 'react-confetti'
 import styles from './Game.module.scss'
+import Link from "next/link";
 
 import { SetDataContext } from '../pages'
 import { KonvaEventObject } from 'konva/lib/Node';
@@ -18,12 +19,14 @@ export default function Game({handleBack}: {handleBack: MouseEventHandler}) {
     
     const [playerPosition, setPlayerPosition] = useState({x: 0,y: 0})
 
-    const canvasWidth = Math.min(window.innerWidth, 400)
-    const canvasHeight = Math.min(window.innerWidth, 400)
+    const canvasWidth = Math.min(900, 400)
+    const canvasHeight = Math.min(900, 400)
+
+    console.log(setData)
 
     const blockData = {
-        width: canvasWidth / [setData.gridData][0].length,
-        height: canvasHeight / setData.gridData.length
+        width: canvasWidth / [setData.grid_data][0].length,
+        height: canvasHeight / setData.grid_data.length
     }
 
     interface attributes {
@@ -48,7 +51,7 @@ export default function Game({handleBack}: {handleBack: MouseEventHandler}) {
     
     function renderBoard() {
 
-        setData.gridData.map((row: {color: string}[], index: number) => {
+        setData.grid_data.map((row: {color: string}[], index: number) => {
             for (const block in row) {
                 let numBlock = parseInt(block)
                 let currentBlock = row[numBlock]
@@ -260,7 +263,12 @@ export default function Game({handleBack}: {handleBack: MouseEventHandler}) {
             <div className={styles.actions}>
                 <div>Game name: {(setData.setName) || `no name`}</div>
                 <div>Objective: move blue to red<br/>without touching black</div>
-                <button onClick={handleBack}>Return to Editor</button><br />
+                
+            <Link
+                href={`/set/${setData._id}`} as={`/set/${setData._id}`}>
+                Edit level
+            </Link>
+            <br />
                 <button onClick={resetGame}>reset game</button>
             </div>
         </div>

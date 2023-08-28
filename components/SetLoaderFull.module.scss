@@ -18,7 +18,18 @@
     margin-block: 3rem;
 }
 .setButton {
+  background-color: #fafafe;
+  border-radius: 5px;
+  padding: 8px;
     margin: 4px;
+    text-align: center;
+    text-decoration: none;
+}
+.setButton:hover {
+  background-color: #8383a8;
+}
+.setButton:active {
+  background-color: #50506b;
 }
 .setButton img {
     height: 100px;

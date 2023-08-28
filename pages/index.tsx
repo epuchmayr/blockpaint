@@ -1,7 +1,7 @@
 import Head from 'next/head'
 import clientPromise from '../lib/mongodb'
 import { InferGetServerSidePropsType } from 'next'
-import { ChangeEvent, FocusEvent, BaseSyntheticEvent, useEffect, useState, createContext } from 'react'
+import { ChangeEvent, FocusEvent, BaseSyntheticEvent, useEffect, useState, createContext, Suspense } from 'react'
 
 import { TOOLS, PREFS, GRID, APPSTATE } from '../CONSTANTS'
 
@@ -363,92 +363,16 @@ export default function Home({
 
 
       {(viewState === APPSTATE.LOADER) && (
-        <SessionPrefsContext.Provider value={sessionPrefs}>
-          <AllSetsDataContext.Provider value={setsData}>
-            <SetLoaderFull handleLoadNew={handleLoadNew} handleLoad={(e: any) => {handleLoad(e);handleSetMode(APPSTATE.CREATOR)}} />
-          </AllSetsDataContext.Provider>
-        </SessionPrefsContext.Provider>
-      )}
-
-      {(viewState === APPSTATE.CREATOR) && (
-        <>
-        <SessionPrefsContext.Provider value={sessionPrefs}>
-          <AllSetsDataContext.Provider value={setsData}>
-            <SetLoader handleSetMode={handleSetMode} handleLoadNew={handleLoadNew} handleLoad={handleLoad} />
-          </AllSetsDataContext.Provider>
-        </SessionPrefsContext.Provider>
-      
-      <main>
-
-        <SessionPrefsContext.Provider value={sessionPrefs}>
-          <Toolbar
-            handleClickTool={handleClickTool}
-          />
-        </SessionPrefsContext.Provider>
         
-        <div className='artboard'>
-          <Grid gridData={setData.gridData} handleMouseDown={handleMouseDown} handleMouseEnter={handleMouseEnter} />
-        </div>
-
-        <aside className='options-menu'>
-          <p>
-          {`${GRIDWIDTH} x ${GRIDHEIGHT}`}
-          </p>
-          <canvas id='canvas' width="150" height="150">canvas</canvas>
-          <br />
-          {(sessionPrefs.currentSetId !== '') ? (
-            <>
-              <input name='setName' value={setData.setName} placeholder={sessionPrefs.currentSetId} onChange={(e) => updateSetData(e)} />
-              <br />
-              <button onClick={() => handleLoad(sessionPrefs.currentSetId)}>Reload set</button>
-              {` `}
-              <button onClick={() => handleDelete(sessionPrefs.currentSetId)}>DELETE set</button>
-              <br />
-              <button onClick={handleDownload}>Download as PNG</button>
-              <br />
-              <br />
-            </>
-          ) : null}
-          <button
-            onClick={() => handleSave(sessionPrefs.currentSetId)}
-          >
-            {(sessionPrefs.currentSetId !== '') ? `Overwrite set` : `Save as a new set`}
-          </button>
-          <br />
-          <br />
-
-          
-
-          <input
-            className='foregroundColour'
-            name='color'
-            type='color'
-            value={sessionPrefs.currentColor.toString()}
-            onChange={handlePickerChange}
-            onBlur={handlePickerBlur}
-            />
-
-          <Palettes
-            handleChangeColor={handleChangeColor}
-          />
-
-
-          <button onClick={() => handleSetMode(APPSTATE.GAMING)}>Game it</button>
-        </aside>
-      </main>
-      </>
+        <Suspense fallback={<p>Loading sets...</p>}>
+          <SessionPrefsContext.Provider value={sessionPrefs}>
+            <AllSetsDataContext.Provider value={setsData}>
+              <SetLoaderFull handleLoadNew={handleLoadNew} handleLoad={(e: any) => {handleLoad(e);handleSetMode(APPSTATE.CREATOR)}} />
+            </AllSetsDataContext.Provider>
+          </SessionPrefsContext.Provider>
+        </Suspense>
       )}
 
-      {(viewState === APPSTATE.GAMING) && (
-        
-        <>
-        <SessionPrefsContext.Provider value={sessionPrefs}>
-          <SetDataContext.Provider value={setData}>
-            <Game handleBack={() => handleSetMode(APPSTATE.CREATOR)} />
-          </SetDataContext.Provider>
-        </SessionPrefsContext.Provider>
-        </>
-      )}
 
       <footer>
       </footer>
@@ -489,33 +413,11 @@ export default function Home({
           overflow:hidden;
         }
 
-        aside {
-          overflow: auto;
-        }
-        .artboard {
-          align-items: center;
-          flex: 1 0 auto;
-
-          display: flex;
-          justify-content: center;
-          overflow: auto;
-          height: 100%;
-        }
-        .options-menu {
-          border-left: 1px solid #aaa;
-        }
-
         
     @media (max-width: 900px) {
       main {
         flex-direction: column;
         overflow: auto;
-      }
-      .artboard {
-        height: auto;
-      }
-      .options-menu {
-        min-height: 200px;
       }
     }
 
@@ -547,15 +449,6 @@ export default function Home({
         a {
           color: inherit;
           text-decoration: none;
-        }
-
-        code {
-          background: #fafafa;
-          border-radius: 5px;
-          padding: 0.75rem;
-          font-size: 1.1rem;
-          font-family: Menlo, Monaco, Lucida Console, Liberation Mono,
-            DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace;
         }
 
         @media (max-width: 600px) {

@@ -9,6 +9,7 @@ export default async (req, res) => {
       const blockSet = await db
           .collection("blockSet")
           .find({})
+          .project({ set_name: 1, thumbnail: 1 })
           .toArray();
 
       res.json(blockSet);

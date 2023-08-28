@@ -1,5 +1,6 @@
 import { useContext } from 'react'
 import styles from './SetLoaderFull.module.scss'
+import Link from 'next/link'
 
 import { SessionPrefsContext, AllSetsDataContext } from '../pages'
 
@@ -19,15 +20,21 @@ export default function SetLoaderFull({
             <div className={styles.setLoader}>
                 {allSetsData.map((set: {_id: string, thumbnail: string, set_name: string}, index) => {
                 return (
-                    <button
-                    key={set._id}
-                    className={`${styles.setButton} ${(sessionPrefs.currentSetId === set._id) ? styles.setButtonSelected : ''}`}
-                    onClick={() => handleLoad(set._id)}
-                    >
-                    <img src={`${set.thumbnail}`} alt='' />
-                    <br />
-                    {set.set_name}
-                    </button>
+                    <>
+                        {/* <button
+                            key={set._id}
+                            className={`${styles.setButton} ${(sessionPrefs.currentSetId === set._id) ? styles.setButtonSelected : ''}`}
+                            onClick={() => handleLoad(set._id)}
+                            >
+                        </button> */}
+                        <Link
+                            className={`${styles.setButton} ${(sessionPrefs.currentSetId === set._id) ? styles.setButtonSelected : ''}`}
+                            href={`/set/${set._id}`} as={`/set/${set._id}`}>
+                            <img src={`${set.thumbnail}`} alt='' />
+                            <br />
+                            {set.set_name || '[unnamed]'}
+                        </Link>
+                    </>
                 )
                 })}
             </div>
