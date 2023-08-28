@@ -22,11 +22,9 @@ export default function Game({handleBack}: {handleBack: MouseEventHandler}) {
     const canvasWidth = Math.min(900, 400)
     const canvasHeight = Math.min(900, 400)
 
-    console.log(setData)
-
     const blockData = {
-        width: canvasWidth / [setData.grid_data][0].length,
-        height: canvasHeight / setData.grid_data.length
+        width: canvasWidth / [setData.gridData][0].length,
+        height: canvasHeight / setData.gridData.length
     }
 
     interface attributes {
@@ -51,7 +49,7 @@ export default function Game({handleBack}: {handleBack: MouseEventHandler}) {
     
     function renderBoard() {
 
-        setData.grid_data.map((row: {color: string}[], index: number) => {
+        setData.gridData.map((row: {color: string}[], index: number) => {
             for (const block in row) {
                 let numBlock = parseInt(block)
                 let currentBlock = row[numBlock]

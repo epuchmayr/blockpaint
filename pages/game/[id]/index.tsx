@@ -42,6 +42,12 @@ export default function Set({
   };
 }) {
 
+  let gameData = {
+    gridData: setData.grid_data,
+    gridWidth: setData.grid_width,
+    gridHeight: setData.grid_height,
+    setName: setData.set_name
+  }
 
   return (
     <Layout>
@@ -51,7 +57,7 @@ export default function Set({
       </Head>
         
         <>
-          <SetDataContext.Provider value={setData}>
+          <SetDataContext.Provider value={gameData}>
             <Game handleBack={() => handleSetMode(APPSTATE.CREATOR)}  />
           </SetDataContext.Provider>
         </>
