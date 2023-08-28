@@ -63,7 +63,7 @@ const defaultSessionPrefs = {
     gridData: [],
     gridWidth: Number,
     gridHeight: Number,
-    setName: String
+    setName: string
   }
 
   // SET context to share state with children

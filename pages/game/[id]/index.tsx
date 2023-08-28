@@ -31,8 +31,8 @@ export default function Set({
   setData: {
     _id: string;
     grid_data: [];
-    grid_width: string;
-    grid_height: string;
+    grid_width: Number;
+    grid_height: Number;
     thumbnail: string;
     created_date: string;
     last_update: string;
