@@ -43,6 +43,7 @@ export default function Set({
 }) {
 
   let gameData = {
+    id: setData._id,
     gridData: setData.grid_data,
     gridWidth: setData.grid_width,
     gridHeight: setData.grid_height,

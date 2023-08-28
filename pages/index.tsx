@@ -59,6 +59,7 @@ const defaultSessionPrefs = {
     colorHistory: [DEFAULTCOLOR]
   }
   interface SingleDataContext {
+    id: Number | undefined,
     gridData: [],
     gridWidth: Number,
     gridHeight: Number,
@@ -69,6 +70,7 @@ const defaultSessionPrefs = {
 export const SessionPrefsContext = createContext(defaultSessionPrefs);
 export const AllSetsDataContext = createContext([]);
 export const SetDataContext = createContext<SingleDataContext>({
+  id: undefined,
   gridData: [],
   gridWidth: GRIDWIDTH,
   gridHeight: GRIDHEIGHT,

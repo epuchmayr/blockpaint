@@ -263,7 +263,7 @@ export default function Game({handleBack}: {handleBack: MouseEventHandler}) {
                 <div>Objective: move blue to red<br/>without touching black</div>
                 
             <Link
-                href={`/set/${setData._id}`} as={`/set/${setData._id}`}>
+                href={`/set/${setData.id}`} as={`/set/${setData.id}`}>
                 Edit level
             </Link>
             <br />
