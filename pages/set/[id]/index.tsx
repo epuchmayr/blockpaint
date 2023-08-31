@@ -230,7 +230,7 @@ export default function Set({
   // SAVE image to database
   async function handleSave(setId: string) {
     if (setId !== "") {
-      const response = await fetch(`../api/blockSet/update/${setId}`, {
+      const response = await fetch(`/api/blockSet/update/${setId}`, {
         method: "POST", // or 'PUT'
         headers: {
           "Content-Type": "application/json",
@@ -245,7 +245,7 @@ export default function Set({
       // await handleLoadSets()
 
     } else {
-      const response = await fetch(`../api/blockSet/createSet`, {
+      const response = await fetch(`/api/blockSet/createSet`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
