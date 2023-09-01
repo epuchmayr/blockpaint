@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { GetStaticProps, GetStaticPaths } from "next";
+import { GetStaticProps, GetStaticPaths, GetServerSideProps } from "next";
 import { getAllSetIds, getSetData ,getSetsData } from "../../../lib/set";
 
 import styles from './index.module.scss'
@@ -441,7 +441,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
   };
 };
 
-export const getStaticProps: GetStaticProps = async ({ params }) => {
+export const getServerSideProps: GetServerSideProps = async ({ params }) => {
   const setData = await getSetData(params?.id as string);
   const setsData = await getSetsData();
   return {

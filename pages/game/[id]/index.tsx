@@ -1,6 +1,6 @@
 import Head from "next/head";
 import Link from "next/link";
-import { GetStaticProps, GetStaticPaths } from "next";
+import { GetStaticProps, GetStaticPaths, GetServerSideProps } from "next";
 import { getAllSetIds, getSetData } from "../../../lib/set";
 
 import { createContext } from "react";
@@ -70,15 +70,15 @@ export default function Set({
 }
 
 
-export const getStaticPaths: GetStaticPaths = async () => {
-  let paths = await getAllSetIds();
-  return {
-    paths,
-    fallback: false,
-  };
-};
+// export const getStaticPaths: GetStaticPaths = async () => {
+//   let paths = await getAllSetIds();
+//   return {
+//     paths,
+//     fallback: false,
+//   };
+// };
 
-export const getStaticProps: GetStaticProps = async ({ params }) => {
+export const getServerSideProps: GetServerSideProps = async ({ params }) => {
   const setData = await getSetData(params?.id as string);
   return {
     props: {
