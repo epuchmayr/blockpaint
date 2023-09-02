@@ -1,8 +1,8 @@
-import Link from "next/link";
-import { GetStaticProps, GetStaticPaths, GetServerSideProps } from "next";
-import { getAllSetIds, getSetData ,getSetsData } from "../../../lib/set";
+import Link from 'next/link';
+import { GetServerSideProps } from 'next';
+import { getSetData, getSetsData } from '../../../lib/set';
 
-import styles from './index.module.scss'
+import styles from './index.module.scss';
 
 import {
   ChangeEvent,
@@ -12,14 +12,14 @@ import {
   useState,
   createContext,
   Suspense,
-} from "react";
-import { TOOLS, PREFS, GRID, APPSTATE } from "../../../CONSTANTS";
+} from 'react';
+import { TOOLS, PREFS, GRID } from '../../../CONSTANTS';
 
-import Grid from "../../../components/Grid";
-import Toolbar from "../../../components/Toolbar";
-import Palettes from "../../../components/Palettes";
-import SetLoader from "../../../components/SetLoader";
-import Layout from "../../../components/Layout";
+import Grid from '../../../components/Grid';
+import Toolbar from '../../../components/Toolbar';
+import Palettes from '../../../components/Palettes';
+import SetLoader from '../../../components/SetLoader';
+import Layout from '../../../components/Layout';
 
 // SET constants
 const DEFAULTCOLOR = GRID.DEFAULT_COLOR;
@@ -40,7 +40,7 @@ const gridArray = Array.from(Array(GRIDHEIGHT), () => {
 const defaultSessionPrefs = {
   currentColor: DEFAULTCOLOR,
   currentTool: TOOLS.DRAW,
-  currentSetId: "",
+  currentSetId: '',
   colorHistory: [DEFAULTCOLOR],
 };
 interface SingleDataContext {
@@ -57,12 +57,12 @@ export const SetDataContext = createContext<SingleDataContext>({
   gridData: [],
   gridWidth: GRIDWIDTH,
   gridHeight: GRIDHEIGHT,
-  setName: "",
+  setName: '',
 });
 
 export default function Set({
   setData,
-  setsData
+  setsData,
 }: {
   setData: {
     _id: string;
@@ -76,21 +76,24 @@ export default function Set({
     isLocked: boolean;
     set_name: string;
   };
-  setsData: []
+  setsData: [];
 }) {
-  let [sessionPrefs, setSessionPrefs] = useState({...defaultSessionPrefs, currentSetId: setData._id});
+  let [sessionPrefs, setSessionPrefs] = useState({
+    ...defaultSessionPrefs,
+    currentSetId: setData._id,
+  });
 
   // parse and stringify to deep copy array
   let [newSetData, setNewSetData] = useState({
     gridData: JSON.parse(JSON.stringify(setData.grid_data)),
     gridWidth: setData.grid_width,
     gridHeight: setData.grid_height,
-    setName: setData.set_name || "",
+    setName: setData.set_name || '',
     createdDate: setData.created_date,
     lastUpdate: setData.last_update,
     creator: setData.creator,
     isLocked: setData.isLocked,
-    id: setData._id
+    id: setData._id,
   });
 
   let [isHeldActive, setIsHeldActive] = useState(false);
@@ -114,7 +117,7 @@ export default function Set({
     if (sessionPrefs.currentTool === TOOLS.DRAW) {
       fillSingleBlock(position, sessionPrefs.currentColor);
     } else if (sessionPrefs.currentTool === TOOLS.ERASE) {
-      fillSingleBlock(position, "#ffffff");
+      fillSingleBlock(position, '#ffffff');
     } else if (sessionPrefs.currentTool === TOOLS.EYEDROP) {
       setSessionPrefs((prevPrefs) => {
         return {
@@ -167,16 +170,17 @@ export default function Set({
   }
 
   function handleClickTool(event: BaseSyntheticEvent) {
-    setSessionPrefs((prevPrefs) => {
-      return { ...prevPrefs, currentTool: event.target.value };
-    });
+    setSessionPrefs((prevPrefs) => ({
+      ...prevPrefs,
+      currentTool: event.target.value,
+    }));
   }
 
   // UPDATE canvas
   useEffect(() => {
     // if (viewState !== APPSTATE.CREATOR) return;
-    const canvas = document.getElementById("canvas") as HTMLCanvasElement;
-    const ctx = canvas && canvas?.getContext("2d");
+    const canvas = document.getElementById('canvas') as HTMLCanvasElement;
+    const ctx = canvas && canvas?.getContext('2d');
 
     newSetData.gridData.map((row: { color: string }[], index: number) => {
       for (const block in row) {
@@ -205,7 +209,7 @@ export default function Set({
 
   function makeEncodedImage() {
     const canvas: HTMLCanvasElement = document.getElementById(
-      "canvas"
+      'canvas'
     ) as HTMLCanvasElement;
     const encodedImage = canvas!.toDataURL();
     return encodedImage;
@@ -216,9 +220,9 @@ export default function Set({
     if (!downloadImage) return;
     const encodedImage = makeEncodedImage();
 
-    var element = document.createElement("a");
-    element.setAttribute("href", encodedImage);
-    element.setAttribute("download", "file");
+    var element = document.createElement('a');
+    element.setAttribute('href', encodedImage);
+    element.setAttribute('download', 'file');
 
     document.body.appendChild(element);
     element.click();
@@ -229,11 +233,11 @@ export default function Set({
 
   // SAVE image to database
   async function handleSave(setId: string) {
-    if (setId !== "") {
+    if (setId !== '') {
       const response = await fetch(`/api/blockSet/update/${setId}`, {
-        method: "POST", // or 'PUT'
+        method: 'POST', // or 'PUT'
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           grid_data: newSetData.gridData,
@@ -243,22 +247,21 @@ export default function Set({
         }),
       });
       // await handleLoadSets()
-
     } else {
       const response = await fetch(`/api/blockSet/createSet`, {
-        method: "POST",
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           grid_data: newSetData.gridData,
           grid_width: newSetData.gridWidth,
           grid_height: newSetData.gridHeight,
           thumbnail: makeEncodedImage(),
-          set_name: "",
+          set_name: '',
           created_date: new Date(),
           last_update: new Date(),
-          creator: "",
+          creator: '',
           isLocked: false,
         }),
       });
@@ -275,23 +278,22 @@ export default function Set({
     // const response = await fetch(`../api/blockSet/${setId}`);
     // const jsonData = await response.json();
     // console.log('new load', setData)
-    
+
     setNewSetData((prevData) => ({
       ...prevData,
       gridData: JSON.parse(JSON.stringify(setData.grid_data)),
       gridWidth: setData.grid_width,
       gridHeight: setData.grid_height,
-      setName: setData.set_name || "",
+      setName: setData.set_name || '',
       createdDate: setData.created_date,
       lastUpdate: setData.last_update,
       creator: setData.creator,
       isLocked: setData.isLocked,
-      id: setData._id
+      id: setData._id,
     }));
     setSessionPrefs((prevPrefs) => {
       return { ...prevPrefs, currentSetId: setData._id };
     });
-    
   }
 
   // DELETE image from database
@@ -316,42 +318,41 @@ export default function Set({
     setNewSetData((prevData) => ({
       ...prevData,
       gridData: JSON.parse(JSON.stringify(gridArray)),
-      setName: "",
+      setName: '',
     }));
     setSessionPrefs((prevPrefs) => ({
       ...prevPrefs,
-      currentSetId: "",
+      currentSetId: '',
     }));
   }
 
   useEffect(() => {
     // handleLoadSets()
     if (sessionPrefs.currentSetId !== '') {
-      handleLoad(sessionPrefs.currentSetId)
+      handleLoad(sessionPrefs.currentSetId);
     }
-  }, [setData])
+  }, [setData]);
 
   return (
     <>
       <Layout>
-
         <SessionPrefsContext.Provider value={sessionPrefs}>
           <AllSetsDataContext.Provider value={setsData}>
             <SetLoader handleLoadNew={handleLoadNew} />
           </AllSetsDataContext.Provider>
         </SessionPrefsContext.Provider>
 
-
-        <div className={styles.main}
+        <div
+          className={`${styles.main} flex-col overflow-auto md:flex-row`}
           onMouseDown={() => setIsHeldActive(true)}
           onMouseUp={() => setIsHeldActive(false)}
-          onMouseEnter={() => setIsHeldActive(false)}>
-
+          onMouseEnter={() => setIsHeldActive(false)}
+        >
           <SessionPrefsContext.Provider value={sessionPrefs}>
             <Toolbar handleClickTool={handleClickTool} />
           </SessionPrefsContext.Provider>
 
-          <div className={styles.artboard}>
+          <div className="flex flex-auto justify-center items-center">
             <Suspense fallback={<p>Loading set...</p>}>
               <Grid
                 gridData={newSetData.gridData}
@@ -364,7 +365,7 @@ export default function Set({
           <aside className={styles.optionsMenu}>
             ID: {newSetData.id}
             <br />
-            Set name: {newSetData.setName || "[unnamed]"}
+            Set name: {newSetData.setName || '[unnamed]'}
             <br />
             Created: {new Date(newSetData.createdDate).toUTCString()}
             <br />
@@ -372,26 +373,28 @@ export default function Set({
             <br />
             Dimensions: {newSetData.gridWidth} x {newSetData.gridHeight}
             <br />
-            Creator: {newSetData.creator || "[unknown]"}
+            Creator: {newSetData.creator || '[unknown]'}
             <br />
             isLocked: {newSetData.isLocked.toString()}
             <br />
-            <Link
-                href={`/game/${setData._id}`} as={`/game/${setData._id}`}>
-                Play {setData.set_name || '[unnamed]'}
-            </Link><br />
-            {(JSON.stringify(setData.grid_data) === JSON.stringify(newSetData.gridData)) ? '' : '(save changes to update play)'}
+            <Link href={`/game/${setData._id}`} as={`/game/${setData._id}`}>
+              Play {setData.set_name || '[unnamed]'}
+            </Link>
+            <br />
+            {JSON.stringify(setData.grid_data) ===
+            JSON.stringify(newSetData.gridData)
+              ? ''
+              : '(save changes to update play)'}
             <br />
             <p>{`${setData.grid_width} x ${setData.grid_height}`}</p>
-
-            <canvas id="canvas" width="150" height="150">
+            <canvas id='canvas' width='150' height='150'>
               canvas
             </canvas>
             <br />
-            {sessionPrefs.currentSetId !== "" ? (
+            {sessionPrefs.currentSetId !== '' ? (
               <>
                 <input
-                  name="setName"
+                  name='setName'
                   value={newSetData.setName}
                   placeholder={sessionPrefs.currentSetId}
                   onChange={(e) => updateSetData(e)}
@@ -409,37 +412,27 @@ export default function Set({
               </>
             ) : null}
             <button onClick={() => handleSave(sessionPrefs.currentSetId)}>
-              {sessionPrefs.currentSetId !== ""
+              {sessionPrefs.currentSetId !== ''
                 ? `Save changes`
                 : `Save as a new`}
             </button>
             <br />
             <br />
             <input
-              className="foregroundColour"
-              name="color"
-              type="color"
+              className='foregroundColour'
+              name='color'
+              type='color'
               value={sessionPrefs.currentColor.toString()}
               onChange={handlePickerChange}
               onBlur={handlePickerBlur}
             />
             <Palettes handleChangeColor={handleChangeColor} />
-
-
           </aside>
         </div>
       </Layout>
     </>
   );
 }
-
-// export const getStaticPaths: GetStaticPaths = async () => {
-//   let paths = await getAllSetIds();
-//   return {
-//     paths,
-//     fallback: false,
-//   };
-// };
 
 export const getServerSideProps: GetServerSideProps = async ({ params }) => {
   const setData = await getSetData(params?.id as string);

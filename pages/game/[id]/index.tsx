@@ -1,21 +1,20 @@
-import Head from "next/head";
-import Link from "next/link";
-import { GetStaticProps, GetStaticPaths, GetServerSideProps } from "next";
-import { getAllSetIds, getSetData } from "../../../lib/set";
+import Head from 'next/head';
+import { GetServerSideProps } from 'next';
+import { getSetData } from '../../../lib/set';
 
-import { createContext } from "react";
-import { SetDataContext } from '../../../pages'
+import { createContext } from 'react';
+import { SetDataContext } from '../../../pages';
 
-import { TOOLS, PREFS, GRID, APPSTATE } from "../../../CONSTANTS";
-import Layout from "../../../components/Layout";
-import Game from "../../../components/Game";
+import { TOOLS } from '../../../CONSTANTS';
+import Layout from '../../../components/Layout';
+import Game from '../../../components/Game';
 
-const defaultSessionPrefs = { 
+const defaultSessionPrefs = {
   currentColor: '#fff',
   currentTool: TOOLS.DRAW,
   currentSetId: '',
-  colorHistory: ['#fff']
-}
+  colorHistory: ['#fff'],
+};
 export const SessionPrefsContext = createContext(defaultSessionPrefs);
 export const AllSetsDataContext = createContext([]);
 // export const SetDataContext = createContext<SingleDataContext>({
@@ -41,42 +40,24 @@ export default function Set({
     set_name: string;
   };
 }) {
-
   let gameData = {
     id: setData._id,
     gridData: setData.grid_data,
     gridWidth: setData.grid_width,
     gridHeight: setData.grid_height,
-    setName: setData.set_name
-  }
+    setName: setData.set_name,
+  };
 
   return (
     <Layout>
-      <Head>
-        <title>Blockpaint</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-        
-        <>
-          <SetDataContext.Provider value={gameData}>
-            <Game />
-          </SetDataContext.Provider>
-        </>
 
-      <footer>
-      </footer>
-  </Layout>
-  )
+      <SetDataContext.Provider value={gameData}>
+        <Game />
+      </SetDataContext.Provider>
+
+    </Layout>
+  );
 }
-
-
-// export const getStaticPaths: GetStaticPaths = async () => {
-//   let paths = await getAllSetIds();
-//   return {
-//     paths,
-//     fallback: false,
-//   };
-// };
 
 export const getServerSideProps: GetServerSideProps = async ({ params }) => {
   const setData = await getSetData(params?.id as string);

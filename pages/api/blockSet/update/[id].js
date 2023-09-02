@@ -21,7 +21,7 @@ export default async (req, res) => {
                 }}
                 )
        
-        console.log(`Set updated with the following id: ${result.upsertedId}`)
+        console.log(`Set updated with the following id: ${id} - ${result.upsertedId}`)
         // console.log('passed data', req.body)
 
         res.json(result);

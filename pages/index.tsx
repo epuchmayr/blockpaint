@@ -405,24 +405,6 @@ export default function Home({
           flex-direction: column;
         }
 
-        main {
-          display: flex;
-          flex: auto;
-          flex-direction: row;
-          width: 100%;
-          height: 10px;
-
-          overflow:hidden;
-        }
-
-        
-    @media (max-width: 900px) {
-      main {
-        flex-direction: column;
-        overflow: auto;
-      }
-    }
-
         .foregroundColour {
           padding: 0;
       }
@@ -446,18 +428,6 @@ export default function Home({
           display: flex;
           justify-content: center;
           align-items: center;
-        }
-
-        a {
-          color: inherit;
-          text-decoration: none;
-        }
-
-        @media (max-width: 600px) {
-          .grid {
-            width: 100%;
-            flex-direction: column;
-          }
         }
       `}</style>
 
