@@ -20,6 +20,7 @@ import Toolbar from '../../../components/Toolbar';
 import Palettes from '../../../components/Palettes';
 import SetLoader from '../../../components/SetLoader';
 import Layout from '../../../components/Layout';
+import Button from '../../../components/Button';
 
 // SET constants
 const DEFAULTCOLOR = GRID.DEFAULT_COLOR;
@@ -352,7 +353,7 @@ export default function Set({
             <Toolbar handleClickTool={handleClickTool} />
           </SessionPrefsContext.Provider>
 
-          <div className="flex flex-auto justify-center items-center">
+          <div className='flex flex-auto justify-center items-center'>
             <Suspense fallback={<p>Loading set...</p>}>
               <Grid
                 gridData={newSetData.gridData}
@@ -363,6 +364,7 @@ export default function Set({
           </div>
 
           <aside className={styles.optionsMenu}>
+            <div className='p-2'>
             {/* ID: {newSetData.id}
             <br /> */}
             Name: {newSetData.setName || '[unnamed]'}
@@ -377,21 +379,13 @@ export default function Set({
             <br />
             {/* isLocked: {newSetData.isLocked.toString()}
             <br /> */}
-            <Link className="border inline-block px-2 mb-3 rounded-sm border-slate-300 bg-slate-300" href={`/game/${setData._id}`} as={`/game/${setData._id}`}>
-              Play {setData.set_name || '[unnamed]'}
-            </Link>
-            <br />
-            {JSON.stringify(setData.grid_data) ===
-            JSON.stringify(newSetData.gridData)
-              ? ''
-              : '(save changes to update play)'}
-            <br />
-            <p>{`${setData.grid_width} x ${setData.grid_height}`}</p>
-            <canvas id='canvas' width='150' height='150'>
-              canvas
-            </canvas>
-            <br />
-            {sessionPrefs.currentSetId !== '' ? (
+            <div className='h-0 w-0 overflow-hidden'>
+              <p>{`${setData.grid_width} x ${setData.grid_height}`}</p>
+              <canvas id='canvas' width='500' height='500'>
+                canvas
+              </canvas>
+            </div>
+            {sessionPrefs.currentSetId !== '' && (
               <>
                 <input
                   name='setName'
@@ -399,24 +393,48 @@ export default function Set({
                   placeholder={sessionPrefs.currentSetId}
                   onChange={(e) => updateSetData(e)}
                 />
-                <br />
-                <button onClick={() => handleLoad(sessionPrefs.currentSetId)}>
-                  Reload set
-                </button>
-                {` `}
+<div className='flex justify-between'>
+  <div>
+    
+                    <Link
+                      className='border inline-block px-2 rounded-sm border-green-700 bg-green-300'
+                      href={`/game/${setData._id}`}
+                      as={`/game/${setData._id}`}
+                    >
+                      Play {setData.set_name || '[unnamed]'}
+                    </Link>
+    
+  </div>
+<div>
+  
+                    <Button
+                      clickHandler={handleDownload}
+                      buttonText={'Download PNG'}
+                    />
+                    <br />
+                    <Button
+                      clickHandler={() => handleLoad(sessionPrefs.currentSetId)}
+                      type={'warning'}
+                      buttonText={'Reload set'}
+                    />
+  
+</div>
+</div>
+
                 {/* <button onClick={() => handleDelete(sessionPrefs.currentSetId)}>DELETE set</button> */}
-                <br />
-                <button onClick={handleDownload}>Download as PNG</button>
-                <br />
-                <br />
               </>
-            ) : null}
-            <button onClick={() => handleSave(sessionPrefs.currentSetId)}>
-              {sessionPrefs.currentSetId !== ''
-                ? `Save changes`
-                : `Save as a new`}
-            </button>
-            <br />
+            )}
+            <Button
+              clickHandler={() => handleSave(sessionPrefs.currentSetId)}
+              buttonText={
+                sessionPrefs.currentSetId !== ''
+                  ? `Save changes`
+                  : `Save as a new`
+              }
+            />
+                  {/* {JSON.stringify(setData.grid_data) !==
+                    JSON.stringify(newSetData.gridData) &&
+                    (<div>changes detected</div>)} */}
             <br />
             <input
               className='foregroundColour'
@@ -426,6 +444,7 @@ export default function Set({
               onChange={handlePickerChange}
               onBlur={handlePickerBlur}
             />
+            </div>
             <Palettes handleChangeColor={handleChangeColor} />
           </aside>
         </div>

@@ -16,7 +16,7 @@ function ToolSelectMenu({
 }) {
   const sessionPrefs = useContext(SessionPrefsContext);
   return (
-    <div className={styles.toolSelectMenu}>
+    <div className={`${styles.toolSelectMenu} `}>
       {Object.keys(TOOLS).map((value, index) => {
         let isToolSelected =
           sessionPrefs.currentTool === TOOLS[value] ? 'selected' : '';
