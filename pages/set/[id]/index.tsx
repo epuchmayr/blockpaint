@@ -363,21 +363,21 @@ export default function Set({
           </div>
 
           <aside className={styles.optionsMenu}>
-            ID: {newSetData.id}
-            <br />
-            Set name: {newSetData.setName || '[unnamed]'}
+            {/* ID: {newSetData.id}
+            <br /> */}
+            Name: {newSetData.setName || '[unnamed]'}
             <br />
             Created: {new Date(newSetData.createdDate).toUTCString()}
             <br />
-            Updated: {new Date(newSetData.lastUpdate).toUTCString()}
+            Last update: {new Date(newSetData.lastUpdate).toUTCString()}
             <br />
             Dimensions: {newSetData.gridWidth} x {newSetData.gridHeight}
             <br />
             Creator: {newSetData.creator || '[unknown]'}
             <br />
-            isLocked: {newSetData.isLocked.toString()}
-            <br />
-            <Link href={`/game/${setData._id}`} as={`/game/${setData._id}`}>
+            {/* isLocked: {newSetData.isLocked.toString()}
+            <br /> */}
+            <Link className="border inline-block px-2 mb-3 rounded-sm border-slate-300 bg-slate-300" href={`/game/${setData._id}`} as={`/game/${setData._id}`}>
               Play {setData.set_name || '[unnamed]'}
             </Link>
             <br />

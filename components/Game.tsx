@@ -12,6 +12,8 @@ import Confetti from 'react-confetti';
 import styles from './Game.module.scss';
 import Link from 'next/link';
 
+import Button from './Button';
+
 import { SetDataContext } from '../pages';
 import { KonvaEventObject } from 'konva/lib/Node';
 
@@ -25,8 +27,8 @@ export default function Game() {
 
   const [playerPosition, setPlayerPosition] = useState({ x: 0, y: 0 });
 
-  const canvasWidth = Math.min(900, 400);
-  const canvasHeight = Math.min(900, 400);
+  const canvasWidth = Math.min(900, 375);
+  const canvasHeight = Math.min(900, 375);
 
   const blockData = {
     width: canvasWidth / [setData.gridData][0].length,
@@ -251,7 +253,7 @@ export default function Game() {
 
   return (
     <>
-      <div className='flex flex-col justify-center px-5 md:flex-row'>
+      <div className='flex flex-col justify-center md:flex-row'>
         <div className={styles.board}>
           {endGame && !collision && (
             <Confetti
@@ -286,18 +288,26 @@ export default function Game() {
           </Stage>
         </div>
         <div className={styles.actions}>
-          <div>Game name: {setData.setName || `no name`}</div>
           <div>
-            Objective: move blue to red
+            <strong>Name:</strong> {setData.setName || `no name`}
+          </div>
+          <div>
+            <strong>Objective:</strong>
             <br />
-            without touching black
+            <p className='mb-3'>
+              move blue to red
+              <br />
+              blue must not touch black
+              <br />
+              drag blue or use arrow keys
+            </p>
           </div>
 
-          <Link href={`/set/${setData.id}`} as={`/set/${setData.id}`}>
+          <Link className="border inline-block px-2 mb-3 rounded-sm border-slate-300 bg-slate-300" href={`/set/${setData.id}`} as={`/set/${setData.id}`}>
             Edit level
           </Link>
           <br />
-          <button onClick={resetGame}>reset game</button>
+          <Button clickHandler={resetGame} buttonText={'Reset game'} />
         </div>
       </div>
     </>
