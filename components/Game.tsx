@@ -27,8 +27,10 @@ export default function Game() {
 
   const [playerPosition, setPlayerPosition] = useState({ x: 0, y: 0 });
 
-  const canvasWidth = Math.min(900, 375);
-  const canvasHeight = Math.min(900, 375);
+  const [windowSize, setWindowSize] = useState({width: 375, height: 375})
+
+  const canvasWidth = Math.min(600, windowSize.width);
+  const canvasHeight = Math.min(600, windowSize.width);
 
   const blockData = {
     width: canvasWidth / [setData.gridData][0].length,
@@ -238,6 +240,7 @@ export default function Game() {
       x: playerPieceReact.current?.attrs.x,
       y: playerPieceReact.current?.attrs.y,
     });
+    setWindowSize(prev => ({...prev, width: window.innerWidth}))
   }, []);
 
   function resetGame() {
@@ -307,7 +310,7 @@ export default function Game() {
             Edit level
           </Link>
           <br />
-          <Button clickHandler={resetGame} buttonText={'Reset game'} />
+          <Button onClick={resetGame} buttonText={'Reset game'} />
         </div>
       </div>
     </>

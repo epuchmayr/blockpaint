@@ -15,7 +15,7 @@
     justify-content: center;
     min-height: 150px;
     flex: 0 1 auto;
-    margin-block: 3rem;
+    margin-block: 2rem;
 }
 .setButton {
   background-color: #fafafe;
@@ -40,12 +40,17 @@
 }
 
 .newSetButton {
-  margin-inline: 8px;
+  margin: 8px;
+  padding-block: 8px;
   background-color: lightgreen;
   width: 120px;
-  height: 120px;
+  height: 80px;
   align-self: center;
-  border-radius: 10px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 
   img {
     height: 20px;

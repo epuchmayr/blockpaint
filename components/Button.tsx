@@ -1,30 +1,32 @@
 import { Children, MouseEventHandler } from 'react';
 
 export default function Button({
-  clickHandler,
+  onClick,
   buttonText,
-  type = 'default'
+  type = 'button',
+  style = 'default',
+  children,
 }: {
-  clickHandler: MouseEventHandler<HTMLButtonElement>;
-  buttonText: String;
+  onClick: MouseEventHandler<HTMLButtonElement>;
+  buttonText?: String;
   type?: String;
+  style?: String;
+  children?: any;
 }) {
-  let colors = 'bg-slate-300 border-slate-600'
+  let colors = 'bg-slate-300 border-slate-600';
 
-  switch (type) {
+  switch (style) {
     case 'warning':
-    colors = 'bg-red-300 border-slate-600'
-    break;
+      colors = 'bg-red-300 border-slate-600';
+      break;
     default:
       break;
   }
   return (
     <>
-      <button
-        className={`border px-2 rounded-sm ${colors}`}
-        onClick={clickHandler}
-      >
+      <button className={`border px-2 rounded-sm ${colors}`} onClick={onClick}>
         {buttonText}
+        {children}
       </button>
     </>
   );

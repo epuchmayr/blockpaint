@@ -3,6 +3,7 @@ import { GetServerSideProps } from 'next';
 import { getSetData, getSetsData } from '../../../lib/set';
 
 import styles from './index.module.scss';
+import { format } from 'date-fns';
 
 import {
   ChangeEvent,
@@ -365,85 +366,92 @@ export default function Set({
 
           <aside className={styles.optionsMenu}>
             <div className='p-2'>
-            {/* ID: {newSetData.id}
-            <br /> */}
-            Name: {newSetData.setName || '[unnamed]'}
-            <br />
-            Created: {new Date(newSetData.createdDate).toUTCString()}
-            <br />
-            Last update: {new Date(newSetData.lastUpdate).toUTCString()}
-            <br />
-            Dimensions: {newSetData.gridWidth} x {newSetData.gridHeight}
-            <br />
-            Creator: {newSetData.creator || '[unknown]'}
-            <br />
-            {/* isLocked: {newSetData.isLocked.toString()}
-            <br /> */}
-            <div className='h-0 w-0 overflow-hidden'>
-              <p>{`${setData.grid_width} x ${setData.grid_height}`}</p>
-              <canvas id='canvas' width='500' height='500'>
-                canvas
-              </canvas>
-            </div>
-            {sessionPrefs.currentSetId !== '' && (
-              <>
-                <input
-                  name='setName'
-                  value={newSetData.setName}
-                  placeholder={sessionPrefs.currentSetId}
-                  onChange={(e) => updateSetData(e)}
-                />
-<div className='flex justify-between'>
-  <div>
-    
-                    <Link
-                      className='border inline-block px-2 rounded-sm border-green-700 bg-green-300'
-                      href={`/game/${setData._id}`}
-                      as={`/game/${setData._id}`}
-                    >
-                      Play {setData.set_name || '[unnamed]'}
-                    </Link>
-    
-  </div>
-<div>
-  
-                    <Button
-                      clickHandler={handleDownload}
-                      buttonText={'Download PNG'}
-                    />
-                    <br />
-                    <Button
-                      clickHandler={() => handleLoad(sessionPrefs.currentSetId)}
-                      type={'warning'}
-                      buttonText={'Reload set'}
-                    />
-  
-</div>
-</div>
+              <div className='text-sm'>
+                {/* ID: {newSetData.id}
+              <br /> */}
+                Name:&nbsp;
+                  <input
+                    name='setName'
+                    value={newSetData.setName}
+                    placeholder='untitled'
+                    onChange={(e) => updateSetData(e)}
+                  />
+                <br />
+                Created:{' '}
+                {format(
+                  new Date(newSetData.createdDate),
+                  'MMM dd, yyyy - h:mm:ss aa'
+                )}
+                <br />
+                Updated:{' '}
+                {format(
+                  new Date(newSetData.lastUpdate),
+                  'MMM dd, yyyy - h:mm:ss aa'
+                )}
+                <div className='flex justify-between'>
+                  <span>Creator: {newSetData.creator || '[unknown]'}</span>
+                  <span>Dimensions: {newSetData.gridWidth} x {newSetData.gridHeight}</span>
+                </div>
+                {/* isLocked: {newSetData.isLocked.toString()} */}
+              </div>
 
-                {/* <button onClick={() => handleDelete(sessionPrefs.currentSetId)}>DELETE set</button> */}
-              </>
-            )}
-            <Button
-              clickHandler={() => handleSave(sessionPrefs.currentSetId)}
-              buttonText={
-                sessionPrefs.currentSetId !== ''
-                  ? `Save changes`
-                  : `Save as a new`
-              }
-            />
-                  {/* {JSON.stringify(setData.grid_data) !==
+              <div className='h-0 w-0 overflow-hidden'>
+                <p>{`${setData.grid_width} x ${setData.grid_height}`}</p>
+                <canvas id='canvas' width='500' height='500'>
+                  canvas
+                </canvas>
+              </div>
+              {sessionPrefs.currentSetId !== '' && (
+                <>
+                  <div className='flex justify-between'>
+                    <div>
+                      <Link
+                        className='border inline-block px-2 rounded-sm border-green-700 bg-green-300'
+                        href={`/game/${setData._id}`}
+                        as={`/game/${setData._id}`}
+                      >
+                        Play {setData.set_name || '[unnamed]'}
+                      </Link>
+                    </div>
+                    <div>
+                      <Button
+                        onClick={handleDownload}
+                        buttonText={'Download PNG'}
+                      />
+                      <br />
+                      <Button
+                        onClick={() =>
+                          handleLoad(sessionPrefs.currentSetId)
+                        }
+                        type={'warning'}
+                        buttonText={'Reload set'}
+                      />
+                    </div>
+                  </div>
+
+                  {/* <button onClick={() => handleDelete(sessionPrefs.currentSetId)}>DELETE set</button> */}
+                </>
+              )}
+              <Button
+                onClick={() => handleSave(sessionPrefs.currentSetId)}
+                buttonText={
+                  sessionPrefs.currentSetId !== ''
+                    ? `Save changes`
+                    : `Save as a new`
+                }
+              />
+              {/* {JSON.stringify(setData.grid_data) !==
                     JSON.stringify(newSetData.gridData) &&
                     (<div>changes detected</div>)} */}
-            <br />
-            <input
-              className='foregroundColour'
-              name='color'
-              type='color'
-              value={sessionPrefs.currentColor.toString()}
-              onChange={handlePickerChange}
-              onBlur={handlePickerBlur}
-            />
+              <br />
+              <input
+                className='foregroundColour'
+                name='color'
+                type='color'
+                value={sessionPrefs.currentColor.toString()}
+                onChange={handlePickerChange}
+                onBlur={handlePickerBlur}
+              />
             </div>
             <Palettes handleChangeColor={handleChangeColor} />
           </aside>
