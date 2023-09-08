@@ -26,7 +26,7 @@ function ToolSelectMenu({
             key={`${index}-${TOOLS[value]}`}
             className={`${styles.tool} ${styles[value.toLowerCase()]} ${
               isToolSelected && styles.toolSelected
-            }`}
+            } w-8 h-8 md:w-14 md:h-14`}
             value={TOOLS[value].toString()}
             onClick={handleClickTool}
           >
