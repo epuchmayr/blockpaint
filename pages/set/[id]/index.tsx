@@ -115,7 +115,7 @@ export default function Set({
     });
   }
 
-  function handleMouseDown(event: MouseEvent, position: position) {
+  function handlePointerDown(event: PointerEvent, position: position) {
     if (sessionPrefs.currentTool === TOOLS.DRAW) {
       fillSingleBlock(position, sessionPrefs.currentColor);
     } else if (sessionPrefs.currentTool === TOOLS.ERASE) {
@@ -130,9 +130,9 @@ export default function Set({
     }
   }
 
-  function handleMouseEnter(event: MouseEvent, position: position) {
+  function handlePointerEnter(event: PointerEvent, position: position) {
     if (isHeldActive) {
-      handleMouseDown(event, position);
+      handlePointerDown(event, position);
     }
   }
 
@@ -346,9 +346,9 @@ export default function Set({
 
         <div
           className={`${styles.main} flex-col overflow-auto md:flex-row`}
-          onMouseDown={() => setIsHeldActive(true)}
-          onMouseUp={() => setIsHeldActive(false)}
-          onMouseEnter={() => setIsHeldActive(false)}
+          onPointerEnter={() => setIsHeldActive(false)}
+          onPointerDown={() => setIsHeldActive(true)}
+          onPointerUp={() => setIsHeldActive(false)}
         >
           <SessionPrefsContext.Provider value={sessionPrefs}>
             <Toolbar handleClickTool={handleClickTool} />
@@ -358,8 +358,8 @@ export default function Set({
             <Suspense fallback={<p>Loading set...</p>}>
               <Grid
                 gridData={newSetData.gridData}
-                handleMouseDown={handleMouseDown}
-                handleMouseEnter={handleMouseEnter}
+                handlePointerDown={handlePointerDown}
+                handlePointerEnter={handlePointerEnter}
               />
             </Suspense>
           </div>

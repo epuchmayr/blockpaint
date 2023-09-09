@@ -2,16 +2,16 @@ import styles from './Grid.module.scss';
 
 export default function Grid({
   gridData,
-  handleMouseDown,
-  handleMouseEnter,
+  handlePointerDown,
+  handlePointerEnter,
 }: {
   gridData: { color: string; opacity: number }[][];
-  handleMouseDown: Function;
-  handleMouseEnter: Function;
+  handlePointerDown: Function;
+  handlePointerEnter: Function;
 }) {
   return (
     <>
-      <div className={styles.colorGrid}>
+      <div className={`${styles.colorGrid} touch-none`}>
         {gridData.map((gridRow, row) => {
           return (
             <>
@@ -23,11 +23,15 @@ export default function Grid({
                         key={`block${row}${col}`}
                         className={styles.colorBlock}
                         style={{ backgroundColor: block.color.toString() }}
-                        onMouseDown={(e) =>
-                          handleMouseDown(e, { row: row, col: col })
-                        }
-                        onMouseEnter={(e) =>
-                          handleMouseEnter(e, { row: row, col: col })
+                        onPointerDown={(e) => {
+                          handlePointerDown(e, { row: row, col: col });
+                          // proper typing for event
+                          const target = e.target as HTMLButtonElement;
+                          // release capture for mobile drag
+                          target.releasePointerCapture(e.pointerId);
+                        }}
+                        onPointerEnter={(e) =>
+                          handlePointerEnter(e, { row: row, col: col })
                         }
                       ></button>
                     </>
