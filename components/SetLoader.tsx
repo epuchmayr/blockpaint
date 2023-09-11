@@ -40,14 +40,13 @@ export default function SetLoader({
             index
           ) => {
             return (
-                <>
-                    <Link
-                        className={`${styles.setButton} ${(sessionPrefs.currentSetId === set._id) ? styles.setButtonSelected : ''} flex flex-col justify-center items-center leading-4`}
-                        href={`/set/${set._id}`} as={`/set/${set._id}`}>
-                        <img src={`${set.thumbnail}`} alt='' />
-                        {set.set_name || 'unnamed'}
-                    </Link>
-                </>
+              <Link
+                  key={set._id}
+                  className={`${styles.setButton} ${(sessionPrefs.currentSetId === set._id) ? styles.setButtonSelected : ''} flex flex-col justify-center items-center leading-4`}
+                  href={`/set/${set._id}`} as={`/set/${set._id}`}>
+                  <img src={`${set.thumbnail}`} alt='' />
+                  {set.set_name || 'unnamed'}
+              </Link>
             );
           }
         )}

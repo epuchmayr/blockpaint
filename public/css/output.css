@@ -616,6 +616,10 @@ video {
   touch-action: none;
 }
 
+.touch-manipulation {
+  touch-action: manipulation;
+}
+
 .flex-col {
   flex-direction: column;
 }
