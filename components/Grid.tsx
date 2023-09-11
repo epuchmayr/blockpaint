@@ -26,18 +26,23 @@ export default function Grid({
                         onPointerDown={(e) => {
                           handlePointerDown(e, { row: row, col: col });
                           // proper typing for event
-                          const target = e.target as HTMLButtonElement;
-                          // release capture for mobile drag
-                          target.releasePointerCapture(e.pointerId);
+                          // const target = e.target as HTMLButtonElement;
+                          // // release capture for mobile drag
+                          // target.releasePointerCapture(e.pointerId);
                         }}
                         onPointerEnter={(e) => {
-                          handlePointerEnter(e, { row: row, col: col });
+                          handlePointerEnter(e, { row: row, col: col })
+                          // // proper typing for event
+                          // const target = e.target as HTMLButtonElement;
+                          // // release capture for mobile drag
+                          // target.releasePointerCapture(e.pointerId);
+                          // console.log('leave')
                         }}
-                        onPointerLeave={(e) => {
-                          // proper typing for event
+                        onPointerMove={(e) => {
                           const target = e.target as HTMLButtonElement;
                           // release capture for mobile drag
                           target.releasePointerCapture(e.pointerId);
+                          console.log('drag leave')
                         }}
                       ></button>
                     </>
