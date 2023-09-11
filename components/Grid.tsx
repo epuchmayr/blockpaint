@@ -32,6 +32,8 @@ export default function Grid({
                         }}
                         onPointerEnter={(e) => {
                           handlePointerEnter(e, { row: row, col: col });
+                        }}
+                        onPointerLeave={(e) => {
                           // proper typing for event
                           const target = e.target as HTMLButtonElement;
                           // release capture for mobile drag
