@@ -18,12 +18,15 @@ export async function getAllSetIds() {
 // LOAD set data from database
 export async function getSetData(setId: string) {
 
+  try {
     const response = await fetch(`${server}/api/blockSet/${setId}`);
     const jsonData = await response.json();
     const parsedData = JSON.parse(JSON.stringify(jsonData))
     // console.log('getSetData', parsedData)
-
-  return parsedData;
+    return parsedData;
+  } catch (error) {
+    console.error(error);
+  }
 }
 
 

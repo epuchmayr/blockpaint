@@ -127,7 +127,37 @@ export default function Set({
           currentColor: newSetData.gridData[position.row][position.col].color,
         };
       });
+    } else if (sessionPrefs.currentTool === TOOLS.PAINTBUCKET) {
+      console.log('paint it');
+      floodFill(position, sessionPrefs.currentColor);
     }
+  }
+
+  function floodFill(position: position, color: string) {
+    let sr = position.row
+    let sc = position.col
+    let image: Array<[{color: string}]> = newSetData.gridData
+
+    let matrix = [[-1,0], [0, 1], [1,0], [0,-1]]
+    let prevColour = image[position.row][position.col].color
+
+    if(prevColour !== color)  fillPixel(sr, sc)
+
+    function fillPixel (row: number, col: number) {
+        image[row][col].color = color
+        for (let [r,c] of matrix) {
+            let nextRow = row + r
+            let nextCol = col +c
+            if (nextRow < 0 || nextRow >= image.length || nextCol < 0 || nextCol >= image[0].length || image[nextRow][nextCol].color !== prevColour) {
+                continue
+            }
+            fillPixel(nextRow,nextCol)
+        }
+    }
+    setNewSetData((prevData) => ({
+      ...prevData,
+      gridData: image
+    }));
   }
 
   function handlePointerEnter(event: PointerEvent, position: position) {
@@ -318,9 +348,15 @@ export default function Set({
 
   function handleLoadNew() {
     setNewSetData((prevData) => ({
-      ...prevData,
       gridData: JSON.parse(JSON.stringify(gridArray)),
       setName: '',
+      gridWidth: String(GRIDWIDTH),
+      gridHeight: String(GRIDHEIGHT),
+      createdDate: String(new Date()),
+      lastUpdate: String(new Date()),
+      creator: '',
+      isLocked: false,
+      id: '',
     }));
     setSessionPrefs((prevPrefs) => ({
       ...prevPrefs,

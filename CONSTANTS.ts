@@ -13,7 +13,8 @@ export const TOOLS: {
 } = {
     DRAW: '1',
     ERASE: '2',
-    EYEDROP: '3'
+    EYEDROP: '3',
+    PAINTBUCKET: '4'
 }
 
 export const GRID = {
