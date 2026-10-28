@@ -27,7 +27,7 @@ export default function Game() {
 
   const [playerPosition, setPlayerPosition] = useState({ x: 0, y: 0 });
 
-  const [windowSize, setWindowSize] = useState({width: 375, height: 375})
+  const [windowSize, setWindowSize] = useState({ width: 375, height: 375 });
 
   const canvasWidth = Math.min(600, windowSize.width);
   const canvasHeight = Math.min(600, windowSize.width);
@@ -50,6 +50,17 @@ export default function Game() {
       r2.x + r2.width < r1.x ||
       r2.y > r1.y + r1.height ||
       r2.y + r2.height < r1.y
+    );
+  }
+
+  function isAttributes(value: unknown): value is attributes {
+    if (value == null || typeof value !== 'object') return false;
+    const props = value as Partial<attributes>;
+    return (
+      typeof props.x === 'number' &&
+      typeof props.y === 'number' &&
+      typeof props.width === 'number' &&
+      typeof props.height === 'number'
     );
   }
 
@@ -121,10 +132,20 @@ export default function Game() {
     height: number;
   }) {
     level.forEach((element) => {
-      if (haveIntersection(targetAttributes, element.props)) setCollision(true);
+      if (
+        isAttributes(element.props) &&
+        haveIntersection(targetAttributes, element.props)
+      ) {
+        setCollision(true);
+      }
     });
     goal.forEach((element) => {
-      if (haveIntersection(targetAttributes, element.props)) setEndGame(true);
+      if (
+        isAttributes(element.props) &&
+        haveIntersection(targetAttributes, element.props)
+      ) {
+        setEndGame(true);
+      }
     });
   }
 
@@ -143,11 +164,11 @@ export default function Game() {
     return direction === 'horizontal'
       ? Math.min(
           Math.max(targetPosition, 0 + 1),
-          canvasWidth - blockData.width + 1
+          canvasWidth - blockData.width + 1,
         )
       : Math.min(
           Math.max(targetPosition, 0 + 1),
-          canvasHeight - blockData.height + 1
+          canvasHeight - blockData.height + 1,
         );
   }
 
@@ -172,7 +193,7 @@ export default function Game() {
           playerPieceReact.current?.to({
             y: minMaxCanvasSize(
               playerPieceReact.current.attrs.y - blockData.height,
-              'vertical'
+              'vertical',
             ),
             onFinish: () => {
               isMoving = false;
@@ -186,7 +207,7 @@ export default function Game() {
           playerPieceReact.current?.to({
             x: minMaxCanvasSize(
               playerPieceReact.current.attrs.x - blockData.height,
-              'horizontal'
+              'horizontal',
             ),
             onFinish: () => {
               isMoving = false;
@@ -200,7 +221,7 @@ export default function Game() {
           playerPieceReact.current?.to({
             y: minMaxCanvasSize(
               playerPieceReact.current.attrs.y + blockData.height,
-              'vertical'
+              'vertical',
             ),
             onFinish: () => {
               isMoving = false;
@@ -214,7 +235,7 @@ export default function Game() {
           playerPieceReact.current?.to({
             x: minMaxCanvasSize(
               playerPieceReact.current.attrs.x + blockData.height,
-              'horizontal'
+              'horizontal',
             ),
             onFinish: () => {
               isMoving = false;
@@ -240,7 +261,7 @@ export default function Game() {
       x: playerPieceReact.current?.attrs.x,
       y: playerPieceReact.current?.attrs.y,
     });
-    setWindowSize(prev => ({...prev, width: window.innerWidth}))
+    setWindowSize((prev) => ({ ...prev, width: window.innerWidth }));
   }, []);
 
   function resetGame() {
@@ -306,7 +327,11 @@ export default function Game() {
             </p>
           </div>
 
-          <Link className="border inline-block px-2 mb-3 rounded-sm border-slate-300 bg-slate-300" href={`/set/${setData.id}`} as={`/set/${setData.id}`}>
+          <Link
+            className='border inline-block px-2 mb-3 rounded-sm border-slate-300 bg-slate-300'
+            href={`/set/${setData.id}`}
+            as={`/set/${setData.id}`}
+          >
             Edit level
           </Link>
           <br />

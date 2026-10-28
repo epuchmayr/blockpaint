@@ -13,11 +13,12 @@ export default function SetLoaderFull({
 }) {
   const allSetsData = useContext(AllSetsDataContext);
   const sessionPrefs = useContext(SessionPrefsContext);
+  const sets = Array.isArray(allSetsData) ? allSetsData : [];
 
   return (
     <div className={styles.loader}>
       <div className={styles.setLoader}>
-        {allSetsData.map(
+        {sets.map(
           (set: { _id: string; thumbnail: string; set_name: string }) => {
             return (
               <>
@@ -35,7 +36,7 @@ export default function SetLoaderFull({
                 </Link>
               </>
             );
-          }
+          },
         )}
       </div>
       {/* <button className={styles.newSetButton} onClick={() => handleLoadNew()}>

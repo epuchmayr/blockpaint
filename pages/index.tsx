@@ -65,13 +65,13 @@ const defaultSessionPrefs = {
   currentSetId: '',
   colorHistory: [DEFAULTCOLOR],
 };
-interface SingleDataContext {
+type SingleDataContext = {
   id: string | undefined;
   gridData: [];
   gridWidth: Number;
   gridHeight: Number;
   setName: string;
-}
+};
 
 // SET context to share state with children
 export const SessionPrefsContext = createContext(defaultSessionPrefs);
@@ -213,7 +213,7 @@ export default function Home({
 
   function makeEncodedImage() {
     const canvas: HTMLCanvasElement = document.getElementById(
-      'canvas'
+      'canvas',
     ) as HTMLCanvasElement;
     const encodedImage = canvas!.toDataURL();
     return encodedImage;
@@ -307,10 +307,20 @@ export default function Home({
 
   // LOAD sets from database
   async function handleLoadSets() {
-    const response = await fetch(`../api/blockSet/getSets`);
-    const jsonData = await response.json();
-    const parsedData = JSON.parse(JSON.stringify(jsonData));
-    setSetsData(parsedData);
+    try {
+      const response = await fetch(`../api/blockSet/getSets`);
+      const jsonData = await response.json();
+      if (!response.ok || !Array.isArray(jsonData)) {
+        console.error('Failed to load sets', jsonData);
+        setSetsData([]);
+        return;
+      }
+      const parsedData = JSON.parse(JSON.stringify(jsonData));
+      setSetsData(parsedData);
+    } catch (error) {
+      console.error('Failed to load sets', error);
+      setSetsData([]);
+    }
   }
 
   function handleLoadNew() {
@@ -417,8 +427,17 @@ export default function Home({
         body {
           padding: 0;
           margin: 0;
-          font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto,
-            Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue,
+          font-family:
+            -apple-system,
+            BlinkMacSystemFont,
+            Segoe UI,
+            Roboto,
+            Oxygen,
+            Ubuntu,
+            Cantarell,
+            Fira Sans,
+            Droid Sans,
+            Helvetica Neue,
             sans-serif;
         }
 

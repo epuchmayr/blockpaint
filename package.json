@@ -1,26 +1,30 @@
 {
   "private": true,
+  "engines": {
+    "node": ">=20.9.0"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start"
   },
   "dependencies": {
-    "canvas": "2.11.0",
+    "canvas": "^3.2.3",
     "date-fns": "^2.30.0",
-    "konva": "^9.1.0",
+    "konva": "^10.9.0",
     "mongodb": "^4.8.1",
-    "next": "latest",
-    "react": "^18.2.0",
-    "react-confetti": "^6.1.0",
-    "react-dom": "^18.2.0",
-    "react-konva": "^18.2.9"
+    "next": "^16.4.3",
+    "react": "^19.3.1",
+    "react-confetti": "^6.4.0",
+    "react-dom": "^19.3.1",
+    "react-konva": "^19.3.2"
   },
   "devDependencies": {
-    "@types/node": "18.7.5",
-    "@types/react": "16.9.17",
+    "@types/node": "^26.6.5",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
     "sass": "^1.62.0",
     "tailwindcss": "^3.3.3",
-    "typescript": "4.6.3"
+    "typescript": "^5.9.3"
   }
 }

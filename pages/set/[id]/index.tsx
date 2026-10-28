@@ -147,7 +147,7 @@ export default function Set({
         image[row][col].color = color
         for (let [r,c] of matrix) {
             let nextRow = row + r
-            let nextCol = col +c
+            let nextCol = col + c
             if (nextRow < 0 || nextRow >= image.length || nextCol < 0 || nextCol >= image[0].length || image[nextRow][nextCol].color !== prevColour) {
                 continue
             }
