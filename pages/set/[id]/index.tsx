@@ -105,8 +105,28 @@ export default function Set({
     col: number;
   }
 
+  function isValidPosition(position: position) {
+    return (
+      Number.isInteger(position.row) &&
+      Number.isInteger(position.col) &&
+      position.row >= 0 &&
+      position.col >= 0 &&
+      position.row < newSetData.gridData.length &&
+      position.col < (newSetData.gridData[0]?.length || 0)
+    );
+  }
+
   function fillSingleBlock(position: position, newColor: string) {
+    if (!isValidPosition(position)) return;
+
     setNewSetData((prevData) => {
+      if (
+        !prevData.gridData[position.row] ||
+        !prevData.gridData[position.row][position.col]
+      ) {
+        return prevData;
+      }
+
       prevData.gridData[position.row][position.col] = {
         color: newColor,
         opacity: 1,
@@ -116,6 +136,8 @@ export default function Set({
   }
 
   function handlePointerDown(event: PointerEvent, position: position) {
+    if (!isValidPosition(position)) return;
+
     if (sessionPrefs.currentTool === TOOLS.DRAW) {
       fillSingleBlock(position, sessionPrefs.currentColor);
     } else if (sessionPrefs.currentTool === TOOLS.ERASE) {
@@ -134,29 +156,42 @@ export default function Set({
   }
 
   function floodFill(position: position, color: string) {
-    let sr = position.row
-    let sc = position.col
-    let image: Array<[{color: string}]> = newSetData.gridData
+    if (!isValidPosition(position)) return;
 
-    let matrix = [[-1,0], [0, 1], [1,0], [0,-1]]
-    let prevColour = image[position.row][position.col].color
+    let sr = position.row;
+    let sc = position.col;
+    let image: Array<[{ color: string }]> = newSetData.gridData;
 
-    if(prevColour !== color)  fillPixel(sr, sc)
+    let matrix = [
+      [-1, 0],
+      [0, 1],
+      [1, 0],
+      [0, -1],
+    ];
+    let prevColour = image[position.row][position.col].color;
 
-    function fillPixel (row: number, col: number) {
-        image[row][col].color = color
-        for (let [r,c] of matrix) {
-            let nextRow = row + r
-            let nextCol = col + c
-            if (nextRow < 0 || nextRow >= image.length || nextCol < 0 || nextCol >= image[0].length || image[nextRow][nextCol].color !== prevColour) {
-                continue
-            }
-            fillPixel(nextRow,nextCol)
+    if (prevColour !== color) fillPixel(sr, sc);
+
+    function fillPixel(row: number, col: number) {
+      image[row][col].color = color;
+      for (let [r, c] of matrix) {
+        let nextRow = row + r;
+        let nextCol = col + c;
+        if (
+          nextRow < 0 ||
+          nextRow >= image.length ||
+          nextCol < 0 ||
+          nextCol >= image[0].length ||
+          image[nextRow][nextCol].color !== prevColour
+        ) {
+          continue;
         }
+        fillPixel(nextRow, nextCol);
+      }
     }
     setNewSetData((prevData) => ({
       ...prevData,
-      gridData: image
+      gridData: image,
     }));
   }
 
@@ -241,7 +276,7 @@ export default function Set({
 
   function makeEncodedImage() {
     const canvas: HTMLCanvasElement = document.getElementById(
-      'canvas'
+      'canvas',
     ) as HTMLCanvasElement;
     const encodedImage = canvas!.toDataURL();
     return encodedImage;
@@ -406,27 +441,29 @@ export default function Set({
                 {/* ID: {newSetData.id}
               <br /> */}
                 Name:&nbsp;
-                  <input
-                    name='setName'
-                    value={newSetData.setName}
-                    placeholder='untitled'
-                    onChange={(e) => updateSetData(e)}
-                  />
+                <input
+                  name='setName'
+                  value={newSetData.setName}
+                  placeholder='untitled'
+                  onChange={(e) => updateSetData(e)}
+                />
                 <br />
                 Created:{' '}
                 {format(
                   new Date(newSetData.createdDate),
-                  'MMM dd, yyyy - h:mm:ss aa'
+                  'MMM dd, yyyy - h:mm:ss aa',
                 )}
                 <br />
                 Updated:{' '}
                 {format(
                   new Date(newSetData.lastUpdate),
-                  'MMM dd, yyyy - h:mm:ss aa'
+                  'MMM dd, yyyy - h:mm:ss aa',
                 )}
                 <div className='flex justify-between'>
                   <span>Creator: {newSetData.creator || '[unknown]'}</span>
-                  <span>Dimensions: {newSetData.gridWidth} x {newSetData.gridHeight}</span>
+                  <span>
+                    Dimensions: {newSetData.gridWidth} x {newSetData.gridHeight}
+                  </span>
                 </div>
                 {/* isLocked: {newSetData.isLocked.toString()} */}
               </div>
@@ -456,9 +493,7 @@ export default function Set({
                       />
                       <br />
                       <Button
-                        onClick={() =>
-                          handleLoad(sessionPrefs.currentSetId)
-                        }
+                        onClick={() => handleLoad(sessionPrefs.currentSetId)}
                         type={'warning'}
                         buttonText={'Reload set'}
                       />

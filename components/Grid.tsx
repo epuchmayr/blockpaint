@@ -1,5 +1,10 @@
 import styles from './Grid.module.scss';
 
+interface Position {
+  row: number;
+  col: number;
+}
+
 export default function Grid({
   gridData,
   handlePointerDown,
@@ -9,6 +14,25 @@ export default function Grid({
   handlePointerDown: Function;
   handlePointerEnter: Function;
 }) {
+  function getPositionFromEvent(event: {
+    clientX: number;
+    clientY: number;
+  }): Position | null {
+    const element = document.elementFromPoint(event.clientX, event.clientY);
+    const blockElement = element?.closest(
+      '[data-row][data-col]',
+    ) as HTMLElement | null;
+
+    if (!blockElement) return null;
+
+    const row = Number(blockElement.getAttribute('data-row'));
+    const col = Number(blockElement.getAttribute('data-col'));
+
+    if (!Number.isInteger(row) || !Number.isInteger(col)) return null;
+
+    return { row, col };
+  }
+
   return (
     <div className={`${styles.colorGrid} touch-none`}>
       {gridData.map((gridRow, row) => {
@@ -30,8 +54,9 @@ export default function Grid({
                   }}
                   onPointerMove={(e) => {
                     // use pointer move for mobile to test changing element under input position
-                    const newElement = document.elementFromPoint(e.pageX - window.scrollX, e.pageY - window.scrollY)
-                    handlePointerEnter(e, { row: newElement?.getAttribute('data-row'), col: newElement?.getAttribute('data-col') });
+                    const position = getPositionFromEvent(e);
+                    if (!position) return;
+                    handlePointerEnter(e, position);
                   }}
                 ></button>
               );
