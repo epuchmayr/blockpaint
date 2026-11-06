@@ -1,4 +1,5 @@
 import { Children, MouseEventHandler } from 'react';
+import styles from './Button.module.scss';
 
 export default function Button({
   onClick,
@@ -24,7 +25,7 @@ export default function Button({
   }
   return (
     <>
-      <button className={`border px-2 rounded-sm ${colors}`} onClick={onClick}>
+      <button className={`${styles.buttonStyles} ${colors}`} onClick={onClick}>
         {buttonText}
         {children}
       </button>

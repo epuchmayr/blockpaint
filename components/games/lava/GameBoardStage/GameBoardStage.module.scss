@@ -1,0 +1,13 @@
+.board {
+  display: flex;
+  justify-content: center;
+  position: relative;
+}
+
+.stageStyles {
+  canvas {
+    layer {
+      background: orange;
+    }
+  }
+}

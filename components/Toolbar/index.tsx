@@ -1,20 +1,16 @@
-import {
-  ChangeEventHandler,
-  FocusEventHandler,
-  MouseEventHandler,
-  useContext,
-} from 'react';
-import { TOOLS } from '../CONSTANTS';
+import { MouseEvent } from 'react';
+import { TOOLS } from '../../CONSTANTS';
 import styles from './Toolbar.module.scss';
+import { useSessionPrefsStore } from '../../lib/sessionPrefsStore';
 
-import { SessionPrefsContext } from '../pages/set/[id]/index';
+function ToolSelectMenu({}: {}) {
+  const sessionPrefs = useSessionPrefsStore((state) => state.sessionPrefs);
+  const setCurrentTool = useSessionPrefsStore((state) => state.setCurrentTool);
 
-function ToolSelectMenu({
-  handleClickTool,
-}: {
-  handleClickTool: MouseEventHandler;
-}) {
-  const sessionPrefs = useContext(SessionPrefsContext);
+  function handleClickTool(event: MouseEvent<HTMLButtonElement>) {
+    setCurrentTool(event.currentTarget.value);
+  }
+
   return (
     <div className={`${styles.toolSelectMenu} `}>
       {Object.keys(TOOLS).map((value, index) => {
@@ -38,14 +34,10 @@ function ToolSelectMenu({
   );
 }
 
-export default function Toolbar({
-  handleClickTool,
-}: {
-  handleClickTool: MouseEventHandler;
-}) {
+export default function Toolbar({}: {}) {
   return (
     <aside className={styles.toolbar}>
-      <ToolSelectMenu handleClickTool={handleClickTool} />
+      <ToolSelectMenu />
     </aside>
   );
 }

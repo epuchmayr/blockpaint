@@ -1,8 +1,8 @@
-import { useContext } from 'react';
 import styles from './SetLoaderFull.module.scss';
 import Link from 'next/link';
 
-import { SessionPrefsContext, AllSetsDataContext } from '../pages';
+import { useSessionPrefsStore } from '../../lib/sessionPrefsStore';
+import { useSetsStore } from '../../lib/setsStore';
 
 export default function SetLoaderFull({
   handleLoadNew,
@@ -11,8 +11,8 @@ export default function SetLoaderFull({
   handleLoadNew: Function;
   handleLoad: Function;
 }) {
-  const allSetsData = useContext(AllSetsDataContext);
-  const sessionPrefs = useContext(SessionPrefsContext);
+  const allSetsData = useSetsStore((state) => state.setsData);
+  const sessionPrefs = useSessionPrefsStore((state) => state.sessionPrefs);
   const sets = Array.isArray(allSetsData) ? allSetsData : [];
 
   return (

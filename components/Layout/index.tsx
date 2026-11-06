@@ -12,9 +12,6 @@ export default function LayoutCreator({
         <Head>
           <title>Blockpaint</title>
         </Head>
-        <header className={styles.header}>
-          <h1>Blockpaint</h1>
-        </header>
         <main className={styles.main}>
           {children}
         </main>

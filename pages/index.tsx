@@ -7,7 +7,6 @@ import {
   BaseSyntheticEvent,
   useEffect,
   useState,
-  createContext,
   Suspense,
 } from 'react';
 
@@ -16,9 +15,11 @@ import { TOOLS, PREFS, GRID, APPSTATE } from '../CONSTANTS';
 import Grid from '../components/Grid';
 import Toolbar from '../components/Toolbar';
 import Palettes from '../components/Palettes';
-import SetLoader from '../components/SetLoader';
+import SetLoader from '../components/SetLoader/SetLoader';
 import SetLoaderFull from '../components/SetLoaderFull';
-import Game from '../components/Game';
+import Game from '../components/games/maze/Game';
+import { useSessionPrefsStore } from '../lib/sessionPrefsStore';
+import { useSetsStore } from '../lib/setsStore';
 
 export async function getServerSideProps() {
   try {
@@ -65,28 +66,14 @@ const defaultSessionPrefs = {
   currentSetId: '',
   colorHistory: [DEFAULTCOLOR],
 };
-type SingleDataContext = {
-  id: string | undefined;
-  gridData: [];
-  gridWidth: Number;
-  gridHeight: Number;
-  setName: string;
-};
-
-// SET context to share state with children
-export const SessionPrefsContext = createContext(defaultSessionPrefs);
-export const AllSetsDataContext = createContext([]);
-export const SetDataContext = createContext<SingleDataContext>({
-  id: undefined,
-  gridData: [],
-  gridWidth: GRIDWIDTH,
-  gridHeight: GRIDHEIGHT,
-  setName: '',
-});
-
 export default function Home({
   isConnected,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  const patchSessionPrefs = useSessionPrefsStore(
+    (state) => state.patchSessionPrefs,
+  );
+  const setGlobalSetsData = useSetsStore((state) => state.setSetsData);
+
   let [sessionPrefs, setSessionPrefs] = useState(defaultSessionPrefs);
 
   // parse and stringify to deep copy array
@@ -347,6 +334,14 @@ export default function Home({
     }
   }, []);
 
+  useEffect(() => {
+    patchSessionPrefs(sessionPrefs);
+  }, [sessionPrefs, patchSessionPrefs]);
+
+  useEffect(() => {
+    setGlobalSetsData(setsData as any);
+  }, [setsData, setGlobalSetsData]);
+
   return (
     <div
       className='container'
@@ -367,17 +362,13 @@ export default function Home({
 
       {viewState === APPSTATE.LOADER && (
         <Suspense fallback={<p>Loading sets...</p>}>
-          <SessionPrefsContext.Provider value={sessionPrefs}>
-            <AllSetsDataContext.Provider value={setsData}>
-              <SetLoaderFull
-                handleLoadNew={handleLoadNew}
-                handleLoad={(e: any) => {
-                  handleLoad(e);
-                  handleSetMode(APPSTATE.CREATOR);
-                }}
-              />
-            </AllSetsDataContext.Provider>
-          </SessionPrefsContext.Provider>
+          <SetLoaderFull
+            handleLoadNew={handleLoadNew}
+            handleLoad={(e: any) => {
+              handleLoad(e);
+              handleSetMode(APPSTATE.CREATOR);
+            }}
+          />
         </Suspense>
       )}
 

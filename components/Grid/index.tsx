@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import styles from './Grid.module.scss';
 
 interface Position {
@@ -5,7 +6,7 @@ interface Position {
   col: number;
 }
 
-export default function Grid({
+function Grid({
   gridData,
   handlePointerDown,
   handlePointerEnter,
@@ -67,3 +68,5 @@ export default function Grid({
     </div>
   );
 }
+
+export default memo(Grid);
