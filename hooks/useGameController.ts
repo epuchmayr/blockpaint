@@ -9,6 +9,8 @@ import {
   getSpawnPosition,
 } from '../lib/maze/gameBoardService';
 
+export type MazeDirection = 'up' | 'right' | 'down' | 'left';
+
 function haveIntersection(r1: Attributes, r2: Attributes) {
   return !(
     r2.x > r1.x + r1.width ||
@@ -18,8 +20,30 @@ function haveIntersection(r1: Attributes, r2: Attributes) {
   );
 }
 
+function getDirectionForKey(key: string): MazeDirection | null {
+  const normalizedKey = key.toLowerCase();
+
+  switch (normalizedKey) {
+    case 'arrowup':
+    case 'w':
+      return 'up';
+    case 'arrowright':
+    case 'd':
+      return 'right';
+    case 'arrowdown':
+    case 's':
+      return 'down';
+    case 'arrowleft':
+    case 'a':
+      return 'left';
+    default:
+      return null;
+  }
+}
+
 export function useGameController(setData: CurrentSetData) {
   const playerPieceRef = useRef<Konva.Rect>(null);
+  const isMovingRef = useRef(false);
   const [collision, setCollision] = useState(false);
   const [endGame, setEndGame] = useState(false);
   const [windowWidth, setWindowWidth] = useState(375);
@@ -89,12 +113,59 @@ export function useGameController(setData: CurrentSetData) {
   function resetGame() {
     setCollision(false);
     setEndGame(false);
+    isMovingRef.current = false;
 
     const spawn = getSpawnPosition(setData, canvasWidth, canvasHeight);
     playerPieceRef.current?.to({
       x: spawn.x,
       y: spawn.y,
       duration: 0,
+    });
+  }
+
+  function movePlayerInDirection(nextDirection: MazeDirection) {
+    if (isMovingRef.current || collision || endGame || !playerPieceRef.current) {
+      return;
+    }
+
+    isMovingRef.current = true;
+
+    const playerRef = playerPieceRef.current;
+    let nextX = playerRef.attrs.x;
+    let nextY = playerRef.attrs.y;
+
+    switch (nextDirection) {
+      case 'up':
+        nextY = minMaxCanvasSize(playerRef.attrs.y - blockData.height, 'vertical');
+        break;
+      case 'left':
+        nextX = minMaxCanvasSize(
+          playerRef.attrs.x - blockData.height,
+          'horizontal',
+        );
+        break;
+      case 'down':
+        nextY = minMaxCanvasSize(playerRef.attrs.y + blockData.height, 'vertical');
+        break;
+      case 'right':
+        nextX = minMaxCanvasSize(
+          playerRef.attrs.x + blockData.height,
+          'horizontal',
+        );
+        break;
+      default:
+        isMovingRef.current = false;
+        return;
+    }
+
+    playerRef.to({
+      x: nextX,
+      y: nextY,
+      onFinish: () => {
+        isMovingRef.current = false;
+        checkCollision(playerRef.attrs as Attributes);
+      },
+      duration: 0.05,
     });
   }
 
@@ -115,6 +186,7 @@ export function useGameController(setData: CurrentSetData) {
 
   useEffect(() => {
     if (collision || endGame) {
+      isMovingRef.current = false;
       playerPieceRef.current?.to({
         x: -20,
         y: 0,
@@ -123,61 +195,12 @@ export function useGameController(setData: CurrentSetData) {
       return;
     }
 
-    let isMoving = false;
-
     function keycodeReact(event: KeyboardEvent) {
-      if (isMoving || !playerPieceRef.current) return;
-      isMoving = true;
-
-      const playerRef = playerPieceRef.current;
-      let nextX = playerRef.attrs.x;
-      let nextY = playerRef.attrs.y;
-
-      switch (event.key) {
-        case 'ArrowUp':
-        case 'w':
-          nextY = minMaxCanvasSize(
-            playerRef.attrs.y - blockData.height,
-            'vertical',
-          );
-          break;
-        case 'ArrowLeft':
-        case 'a':
-          nextX = minMaxCanvasSize(
-            playerRef.attrs.x - blockData.height,
-            'horizontal',
-          );
-          break;
-        case 'ArrowDown':
-        case 's':
-          nextY = minMaxCanvasSize(
-            playerRef.attrs.y + blockData.height,
-            'vertical',
-          );
-          break;
-        case 'ArrowRight':
-        case 'd':
-          nextX = minMaxCanvasSize(
-            playerRef.attrs.x + blockData.height,
-            'horizontal',
-          );
-          break;
-        default:
-          isMoving = false;
-          return;
-      }
-
-      playerRef.to({
-        x: nextX,
-        y: nextY,
-        onFinish: () => {
-          isMoving = false;
-          checkCollision(playerRef.attrs as Attributes);
-        },
-        duration: 0.05,
-      });
+      const nextDirection = getDirectionForKey(event.key);
+      if (!nextDirection) return;
 
       event.preventDefault();
+      movePlayerInDirection(nextDirection);
     }
 
     window.addEventListener('keydown', keycodeReact, true);
@@ -187,10 +210,7 @@ export function useGameController(setData: CurrentSetData) {
   }, [
     collision,
     endGame,
-    blockData.height,
-    blockData.width,
-    canvasHeight,
-    canvasWidth,
+    movePlayerInDirection,
   ]);
 
   return {
@@ -203,5 +223,6 @@ export function useGameController(setData: CurrentSetData) {
     playerPieceRef,
     handleDragMove,
     resetGame,
+    movePlayerInDirection,
   };
 }

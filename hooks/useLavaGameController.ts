@@ -85,23 +85,36 @@ export function useLavaGameController(setData: CurrentSetData) {
   }
 
   function isValidLandingTile(color: string | undefined) {
-    return color === '#000000' || color === '#00ff00';
+    const normalizedColor = color?.toLowerCase();
+    return (
+      normalizedColor === '#000000' ||
+      normalizedColor === '#00ff00' ||
+      normalizedColor === '#ff0000'
+    );
   }
 
-  function isBlackTileAtPosition(x: number, y: number) {
+  function getTileColorAtPosition(x: number, y: number) {
     const gridCols = setData.gridData[0]?.length || 0;
     const gridRows = setData.gridData.length || 0;
 
-    if (!gridCols || !gridRows) return false;
+    if (!gridCols || !gridRows) return undefined;
 
     const col = Math.floor(x / blockData.width);
     const row = Math.floor(y / blockData.height);
 
     if (row < 0 || row >= gridRows || col < 0 || col >= gridCols) {
-      return false;
+      return undefined;
     }
 
-    return isValidLandingTile(setData.gridData[row]?.[col]?.color);
+    return setData.gridData[row]?.[col]?.color?.toLowerCase();
+  }
+
+  function isHazardTileAtPosition(x: number, y: number) {
+    return getTileColorAtPosition(x, y) === '#ff0000';
+  }
+
+  function isBlackTileAtPosition(x: number, y: number) {
+    return getTileColorAtPosition(x, y) === '#000000';
   }
 
   function getNextBlackTileTarget(playerRef: Konva.Rect): Attributes | null {
@@ -150,6 +163,11 @@ export function useLavaGameController(setData: CurrentSetData) {
   }
 
   function checkCollision(targetAttributes: Attributes) {
+    if (isHazardTileAtPosition(targetAttributes.x, targetAttributes.y)) {
+      setCollision(true);
+      return;
+    }
+
     const isMoveOnBlackTile = isBlackTileAtPosition(
       targetAttributes.x,
       targetAttributes.y,

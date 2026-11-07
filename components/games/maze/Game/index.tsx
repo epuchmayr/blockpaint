@@ -14,6 +14,7 @@ export default function Game() {
     playerPieceRef,
     handleDragMove,
     resetGame,
+    movePlayerInDirection,
   } = useGameController(setData);
 
   return (
@@ -32,6 +33,7 @@ export default function Game() {
           setId={setData.id}
           setName={setData.setName}
           onReset={resetGame}
+          onMoveDirection={movePlayerInDirection}
         />
       </div>
     </>

@@ -34,7 +34,7 @@ export default function Palettes() {
         swatches={colorHistory}
         clickHandler={handleChangeColor}
       />
-      <Accordion type='single' collapsible>
+      <Accordion>
         {SWATCHES.map((swatch, index) => {
           return (
             <AccordionItem value={`item-${index}`}>
