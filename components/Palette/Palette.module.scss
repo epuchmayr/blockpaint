@@ -1,21 +1,20 @@
-
 .palette {
-    border-top: 1px solid #aaa;
-    padding-inline: .5rem;
+  border-top: 1px solid #aaa;
+  padding-inline: 0.5rem;
+  padding-top: 10px;
 }
 .title {
-    font-size: 1rem;
+  font-size: 1rem;
 }
 .swatches {
-    display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    padding-bottom: 10px;
+  display: flex;
+  flex-wrap: wrap;
 }
 .swatch {
-    border: 1px solid lightgrey;
-    width: 40px;
-    height: 40px;
-    margin-right: -1px;
-    margin-bottom: -1px;
-    cursor: pointer;
+  border: 1px solid lightgrey;
+  width: 40px;
+  height: 40px;
+  margin-right: -1px;
+  margin-bottom: -1px;
+  cursor: pointer;
 }

@@ -3,7 +3,7 @@ import styles from '../../../pages/set/index.module.scss';
 
 import SetLoader from '../../SetLoader/SetLoader';
 import Toolbar from '../../Toolbar';
-import Palettes from '../../Palettes';
+import Palettes from '../../Palettes/Palettes';
 import Layout from '../../Layout';
 import SetMetaPanel from '../SetMetaPanel';
 import SetActionsPanel from '../SetActionsPanel';

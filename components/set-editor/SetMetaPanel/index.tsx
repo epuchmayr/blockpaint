@@ -1,7 +1,32 @@
 import { FocusEvent, useEffect, useRef } from 'react';
-import { format } from 'date-fns';
 import { EditableSetData } from '../../../lib/setEditorTypes';
 import { useSessionPrefsStore } from '../../../lib/sessionPrefsStore';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '../../ui/accordion';
+
+const utcDateTimeFormatter = new Intl.DateTimeFormat('en-US', {
+  timeZone: 'UTC',
+  year: 'numeric',
+  month: 'short',
+  day: '2-digit',
+  hour: '2-digit',
+  minute: '2-digit',
+  second: '2-digit',
+  hour12: true,
+});
+
+function formatUtcDate(value: string | null | undefined) {
+  if (!value) return 'N/A';
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return 'N/A';
+
+  return utcDateTimeFormatter.format(date);
+}
 
 type SetMetaPanelProps = {
   setData: EditableSetData;
@@ -62,35 +87,44 @@ export default function SetMetaPanel({
   return (
     <div className='p-2'>
       <div className='text-sm'>
-        Name:&nbsp;
-        <input
-          name='setName'
-          value={setData.setName}
-          placeholder='untitled'
-          onChange={(e) => onUpdateField('setName', e.target.value)}
-        />
-        <br />
-        Created:{' '}
-        {format(new Date(setData.createdDate), 'MMM dd, yyyy - h:mm:ss aa')}
-        <br />
-        Updated:{' '}
-        {format(new Date(setData.lastUpdate), 'MMM dd, yyyy - h:mm:ss aa')}
         <div className='flex justify-between'>
-          <span>Creator: {setData.creator || '[unknown]'}</span>
           <span>
-            Dimensions: {setData.gridWidth} x {setData.gridHeight}
+            Name:&nbsp;
+            <input
+              className='w-20'
+              name='setName'
+              value={setData.setName}
+              placeholder='untitled'
+              onChange={(e) => onUpdateField('setName', e.target.value)}
+            />
           </span>
+          <span>Creator: {setData.creator || '[unknown]'}</span>
+        </div>
+        <Accordion>
+          <AccordionItem value='item-1'>
+            <AccordionTrigger>Details</AccordionTrigger>
+            <AccordionContent>
+              <div className='text-sm'>
+                Created: {formatUtcDate(setData.createdDate)}
+                <br />
+                Updated: {formatUtcDate(setData.lastUpdate)}
+                <div className='flex justify-between'>
+                  <span>Creator: {setData.creator || '[unknown]'}</span>
+                  <span>
+                    Dimensions: {setData.gridWidth} x {setData.gridHeight}
+                  </span>
+                </div>
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
+        <div className='h-0 w-0 overflow-hidden'>
+          <p>{`${setData.gridWidth} x ${setData.gridHeight}`}</p>
+          <canvas ref={canvasRef} id='canvas' width='500' height='500'>
+            canvas
+          </canvas>
         </div>
       </div>
-
-      <div className='h-0 w-0 overflow-hidden'>
-        <p>{`${setData.gridWidth} x ${setData.gridHeight}`}</p>
-        <canvas ref={canvasRef} id='canvas' width='500' height='500'>
-          canvas
-        </canvas>
-      </div>
-
-      <br />
       <input
         className='foregroundColour'
         name='color'

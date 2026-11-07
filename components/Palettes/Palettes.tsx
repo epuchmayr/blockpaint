@@ -3,6 +3,12 @@ import styles from './Palettes.module.scss';
 import Palette from '../Palette';
 import { SWATCHES } from '../../CONSTANTS';
 import { useSessionPrefsStore } from '../../lib/sessionPrefsStore';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '#components/ui/accordion';
 
 export default function Palettes() {
   const colorHistory = useSessionPrefsStore(
@@ -28,16 +34,22 @@ export default function Palettes() {
         swatches={colorHistory}
         clickHandler={handleChangeColor}
       />
-      {SWATCHES.map((swatch, index) => {
-        return (
-          <Palette
-            key={index}
-            title={swatch.name}
-            swatches={swatch.colors}
-            clickHandler={handleChangeColor}
-          />
-        );
-      })}
+      <Accordion type='single' collapsible>
+        {SWATCHES.map((swatch, index) => {
+          return (
+            <AccordionItem value={`item-${index}`}>
+              <AccordionTrigger>{swatch.name}</AccordionTrigger>
+              <AccordionContent>
+                <Palette
+                  key={index}
+                  swatches={swatch.colors}
+                  clickHandler={handleChangeColor}
+                />
+              </AccordionContent>
+            </AccordionItem>
+          );
+        })}
+      </Accordion>
     </div>
   );
 }

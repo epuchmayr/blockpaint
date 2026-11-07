@@ -14,7 +14,7 @@ import { TOOLS, PREFS, GRID, APPSTATE } from '../CONSTANTS';
 
 import Grid from '../components/Grid';
 import Toolbar from '../components/Toolbar';
-import Palettes from '../components/Palettes';
+import Palettes from '../components/Palettes/Palettes';
 import SetLoader from '../components/SetLoader/SetLoader';
 import SetLoaderFull from '../components/SetLoaderFull';
 import Game from '../components/games/maze/Game';
