@@ -7,12 +7,14 @@ export default function Button({
   type = 'button',
   style = 'default',
   children,
+  ...props
 }: {
-  onClick: MouseEventHandler<HTMLButtonElement>;
-  buttonText?: String;
-  type?: String;
-  style?: String;
+  onClick?: MouseEventHandler<HTMLButtonElement>;
+  buttonText?: string;
+  type?: string;
+  style?: string;
   children?: any;
+  [key: string]: any;
 }) {
   let colors = 'bg-slate-300 border-slate-600';
 
@@ -25,7 +27,11 @@ export default function Button({
   }
   return (
     <>
-      <button className={`${styles.buttonStyles} ${colors}`} onClick={onClick}>
+      <button
+        className={`${styles.buttonStyles} ${colors}`}
+        onClick={onClick}
+        {...props}
+      >
         {buttonText}
         {children}
       </button>

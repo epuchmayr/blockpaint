@@ -9,6 +9,8 @@ type GameSidebarProps = {
   setName: string;
   onReset: () => void;
   onMoveDirection: (direction: LavaDirection) => void;
+  collectedCoinCount: number;
+  totalCoinTileCount: number;
 };
 
 export default function GameSidebar({
@@ -16,9 +18,31 @@ export default function GameSidebar({
   setName,
   onReset,
   onMoveDirection,
+  collectedCoinCount,
+  totalCoinTileCount,
 }: GameSidebarProps) {
   return (
     <div className={styles.actions}>
+      <div>
+        <div className={styles.coinInventory}>
+          <strong>
+            {collectedCoinCount !== totalCoinTileCount ? (
+              <span className={styles.missingCoins}>
+                {totalCoinTileCount - collectedCoinCount} coin
+                {totalCoinTileCount - collectedCoinCount !== 1 ? 's' : ''} to
+                collect:
+              </span>
+            ) : (
+              <span className={styles.allCoinsCollected}>
+                All coins collected!
+              </span>
+            )}
+          </strong>
+          {Array.from({ length: collectedCoinCount }).map((_, index) => (
+            <div key={index} className={styles.coinIcon} />
+          ))}
+        </div>
+      </div>
       <div className={styles.controls}>
         <Button onClick={() => onMoveDirection('up')} buttonText={'↑'} />
         <div>

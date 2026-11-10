@@ -119,13 +119,14 @@ export default function GameBoardStage({
 
           <Text text={`Collision detected: ${collision}`} />
           <Text
-            x={120}
-            y={15}
+            x={canvasWidth / 2}
+            y={canvasHeight / 2}
+            // offsetX={120}
             fill='#000'
             stroke='#fff'
             strokeWidth={5}
             fillAfterStrokeEnabled={true}
-            fontSize={30}
+            fontSize={60}
             text={endGame ? 'YOU WIN!' : collision ? 'HIT DETECTED' : ''}
           />
         </Layer>

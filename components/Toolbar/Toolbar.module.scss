@@ -1,46 +1,44 @@
-
-
-
 .toolbar {
-border-right: 1px solid #aaa;
+  border-right: 1px solid #aaa;
 }
 
 .toolSelectMenu {
-    line-height: 0;
-    background-color: #666;
-    border: 1px solid #222;
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
+  line-height: 0;
+  background-color: #666;
+  border: 1px solid #222;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
 }
 .tool {
-    background-color: #666;
-    color: transparent;
-    border: 1px solid #222;
-    line-height: 1;
-    background-size: 100% 100%;
+  background-color: #666;
+  color: transparent;
+  border: 1px solid #222;
+  line-height: 1;
+  background-size: 100% 100%;
+  width: 50px;
+  height: 50px;
 }
 
-
 .toolSelected {
-    filter: invert(1);
+  filter: invert(1);
 }
 
 .draw {
-    background-image: url('/images/icons/draw.png');
+  background-image: url('/images/icons/draw.png');
 }
 .erase {
-    background-image: url('/images/icons/erase.png');
+  background-image: url('/images/icons/erase.png');
 }
 .eyedrop {
-    background-image: url('/images/icons/eyedrop.png');
+  background-image: url('/images/icons/eyedrop.png');
 }
 .paintbucket {
-    background-image: url('/images/icons/paintbucket.png');
+  background-image: url('/images/icons/paintbucket.png');
 }
 
-@media (max-width: 900px) {
-    .toolSelectMenu {
-        display: flex;
-        flex-wrap: wrap;
-    }
+@media screen and (max-width: 860px) {
+  .toolSelectMenu {
+    display: flex;
+    flex-wrap: wrap;
+  }
 }

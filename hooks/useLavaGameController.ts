@@ -10,6 +10,8 @@ import {
 } from '../lib/lava/gameBoardService';
 
 export type LavaDirection = 'up' | 'right' | 'down' | 'left';
+const COIN_TILE_COLOR = '#ffff00';
+const COLLECTED_COIN_TILE_COLOR = '#b8860b';
 
 function haveIntersection(r1: Attributes, r2: Attributes) {
   return !(
@@ -47,21 +49,42 @@ export function useLavaGameController(setData: CurrentSetData) {
   const [collision, setCollision] = useState(false);
   const [endGame, setEndGame] = useState(false);
   const [direction, setDirection] = useState<LavaDirection>('up');
+  const [coinInventory, setCoinInventory] = useState<Record<string, true>>({});
   const [windowWidth, setWindowWidth] = useState(375);
 
   const { canvasWidth, canvasHeight } = getCanvasDimensions(windowWidth);
 
-  const boardPieces = useMemo(() => {
+  const baseBoardPieces = useMemo(() => {
     return buildBoardPieces(setData, canvasWidth, canvasHeight);
   }, [setData, canvasWidth, canvasHeight]);
 
+  const boardPieces = useMemo(() => {
+    return baseBoardPieces.map((piece) => {
+      const isCollectedCoin =
+        piece.color.toLowerCase() === COIN_TILE_COLOR && coinInventory[piece.id];
+
+      if (!isCollectedCoin) return piece;
+
+      return {
+        ...piece,
+        color: COLLECTED_COIN_TILE_COLOR,
+      };
+    });
+  }, [baseBoardPieces, coinInventory]);
+
+  const totalCoinTileCount = useMemo(() => {
+    return baseBoardPieces.filter(
+      (piece) => piece.color.toLowerCase() === COIN_TILE_COLOR,
+    ).length;
+  }, [baseBoardPieces]);
+
   const walls = useMemo(() => {
-    return boardPieces.filter((piece) => piece.type === 'wall');
-  }, [boardPieces]);
+    return baseBoardPieces.filter((piece) => piece.type === 'wall');
+  }, [baseBoardPieces]);
 
   const goals = useMemo(() => {
-    return boardPieces.filter((piece) => piece.type === 'goal');
-  }, [boardPieces]);
+    return baseBoardPieces.filter((piece) => piece.type === 'goal');
+  }, [baseBoardPieces]);
 
   const blockData = useMemo(() => {
     const gridCols = setData.gridData[0]?.length || 1;
@@ -89,7 +112,8 @@ export function useLavaGameController(setData: CurrentSetData) {
     return (
       normalizedColor === '#000000' ||
       normalizedColor === '#00ff00' ||
-      normalizedColor === '#ff0000'
+      normalizedColor === '#ff0000' ||
+      normalizedColor === '#ffff00' // yellow
     );
   }
 
@@ -109,12 +133,44 @@ export function useLavaGameController(setData: CurrentSetData) {
     return setData.gridData[row]?.[col]?.color?.toLowerCase();
   }
 
+  function getTileKeyAtPosition(x: number, y: number) {
+    const gridCols = setData.gridData[0]?.length || 0;
+    const gridRows = setData.gridData.length || 0;
+
+    if (!gridCols || !gridRows) return null;
+
+    const col = Math.floor(x / blockData.width);
+    const row = Math.floor(y / blockData.height);
+
+    if (row < 0 || row >= gridRows || col < 0 || col >= gridCols) {
+      return null;
+    }
+
+    return `${row}-${col}`;
+  }
+
   function isHazardTileAtPosition(x: number, y: number) {
     return getTileColorAtPosition(x, y) === '#ff0000';
   }
 
   function isBlackTileAtPosition(x: number, y: number) {
     return getTileColorAtPosition(x, y) === '#000000';
+  }
+
+  function collectCoinAtPosition(x: number, y: number) {
+    const tileColor = getTileColorAtPosition(x, y);
+    if (tileColor !== COIN_TILE_COLOR) return;
+
+    const tileKey = getTileKeyAtPosition(x, y);
+    if (!tileKey) return;
+
+    setCoinInventory((prevInventory) => {
+      if (prevInventory[tileKey]) return prevInventory;
+      return {
+        ...prevInventory,
+        [tileKey]: true,
+      };
+    });
   }
 
   function getNextBlackTileTarget(playerRef: Konva.Rect): Attributes | null {
@@ -163,6 +219,8 @@ export function useLavaGameController(setData: CurrentSetData) {
   }
 
   function checkCollision(targetAttributes: Attributes) {
+    collectCoinAtPosition(targetAttributes.x, targetAttributes.y);
+
     if (isHazardTileAtPosition(targetAttributes.x, targetAttributes.y)) {
       setCollision(true);
       return;
@@ -203,6 +261,7 @@ export function useLavaGameController(setData: CurrentSetData) {
     setCollision(false);
     setEndGame(false);
     setDirection('up');
+    setCoinInventory({});
 
     const spawn = getSpawnPosition(setData, canvasWidth, canvasHeight);
     playerPieceRef.current?.to({
@@ -228,7 +287,12 @@ export function useLavaGameController(setData: CurrentSetData) {
   }, []);
 
   function movePlayerInDirection(nextDirection: LavaDirection) {
-    if (isMovingRef.current || collision || endGame || !playerPieceRef.current) {
+    if (
+      isMovingRef.current ||
+      collision ||
+      endGame ||
+      !playerPieceRef.current
+    ) {
       return;
     }
 
@@ -286,6 +350,9 @@ export function useLavaGameController(setData: CurrentSetData) {
     boardPieces,
     collision,
     endGame,
+    coinInventory,
+    collectedCoinCount: Object.keys(coinInventory).length,
+    totalCoinTileCount,
     canvasWidth,
     canvasHeight,
     playerPieceRef,

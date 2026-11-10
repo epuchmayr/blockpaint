@@ -24,3 +24,21 @@
     line-height: 0;
   }
 }
+
+.coinIcon {
+  width: 16px;
+  height: 16px;
+  background-color: gold;
+  display: inline-block;
+  border-radius: 50%;
+  margin-left: 4px;
+}
+
+.coinInventory {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+  align-items: center;
+  justify-content: center;
+}

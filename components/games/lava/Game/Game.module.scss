@@ -3,5 +3,14 @@
   left: 0;
 }
 
-@media (max-width: 900px) {
+.endGameDialog {
+  position: fixed;
+  top: 25%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  padding: 1rem;
+  border: 1px solid black;
+  border-radius: 8px;
+  z-index: 1000;
 }

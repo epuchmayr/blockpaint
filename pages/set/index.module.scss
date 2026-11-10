@@ -1,5 +1,3 @@
-
-
 .container {
   background-color: #bbb;
   min-height: 100vh;
@@ -28,4 +26,20 @@
 .optionsMenu {
   border-left: 1px solid #aaa;
   overflow: auto;
+  width: 300px;
+}
+
+@media screen and (max-width: 860px) {
+  .main {
+    flex-direction: column;
+    overflow: auto;
+  }
+  .artboard {
+    height: auto;
+  }
+  .optionsMenu {
+    width: 100%;
+    border-left: none;
+    border-top: 1px solid #aaa;
+  }
 }

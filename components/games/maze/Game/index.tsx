@@ -19,7 +19,7 @@ export default function Game() {
 
   return (
     <>
-      <div className='flex flex-col justify-center md:flex-row'>
+      <div>
         <GameBoardStage
           boardPieces={boardPieces}
           canvasWidth={canvasWidth}

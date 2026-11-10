@@ -124,7 +124,7 @@ export default function SetEditorPage({
       <SetLoader handleLoadNew={handleLoadNew} />
 
       <div
-        className={`${styles.main} flex-col overflow-auto md:flex-row`}
+        className={`${styles.main}`}
         onPointerEnter={() => setIsHeldActive(false)}
         onPointerDown={() => setIsHeldActive(true)}
         onPointerUp={() => setIsHeldActive(false)}
