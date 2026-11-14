@@ -116,6 +116,7 @@ export default function GameBoard3D({
     renderer.shadowMap.type = THREE.PCFShadowMap;
 
     mountElement.innerHTML = '';
+    renderer.domElement.style.display = 'block';
     mountElement.appendChild(renderer.domElement);
 
     const camera = new THREE.PerspectiveCamera(56, 1, 0.1, 400);
@@ -239,7 +240,7 @@ export default function GameBoard3D({
     function resizeRenderer() {
       const width = mountElement.clientWidth || 1;
       const height = mountElement.clientHeight || 1;
-      renderer.setSize(width, height, false);
+      renderer.setSize(width, height, true);
       camera.aspect = width / height;
       camera.updateProjectionMatrix();
     }

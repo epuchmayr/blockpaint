@@ -8,6 +8,16 @@
   background: #c1ddf0;
 }
 
+@media (max-width: 860px) {
+  .board {
+    aspect-ratio: 1 / 1.5;
+    border-width: 0 0 2px;
+    width: 100%;
+    min-width: 0;
+    border-radius: 0;
+  }
+}
+
 .canvas {
   width: 100%;
   height: 100%;

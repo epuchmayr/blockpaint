@@ -58,11 +58,7 @@ export default function GameSidebar({
         <strong>Objective:</strong>
         <br />
         <p className='mb-3'>
-          move blue to red
-          <br />
-          blue must not touch black
-          <br />
-          drag blue or use arrow keys
+          jump over lava tiles, find the finish, gather coins
         </p>
       </div>
 
@@ -71,12 +67,6 @@ export default function GameSidebar({
           variant='default'
           href={`/set/${setId}`}
           buttonText='Edit level'
-        />
-        <br />
-        <NextLink
-          variant='warning'
-          href={`/play/lava-3d/${setId}`}
-          buttonText='Play 3D version'
         />
         <br />
         <Button onClick={() => onReset()} buttonText={'Reset game'} />
