@@ -35,6 +35,11 @@ export default function SetActionsPanel({
                 href={`/play/lava/${gameSetId}`}
                 buttonText={`Lava ${setName || '[unnamed]'}`}
               />
+              <NextLink
+                variant='warning'
+                href={`/play/lava-3d/${gameSetId}`}
+                buttonText={`Lava 3D ${setName || '[unnamed]'}`}
+              />
             </div>
             <div>
               <Button

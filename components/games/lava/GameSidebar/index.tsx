@@ -73,6 +73,12 @@ export default function GameSidebar({
           buttonText='Edit level'
         />
         <br />
+        <NextLink
+          variant='warning'
+          href={`/play/lava-3d/${setId}`}
+          buttonText='Play 3D version'
+        />
+        <br />
         <Button onClick={() => onReset()} buttonText={'Reset game'} />
       </div>
     </div>
